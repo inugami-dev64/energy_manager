@@ -1,5 +1,5 @@
 CC = gcc
-TARGET = powman
+TARGET = energy_manager
 SRC_DIR = src
 OBJ_DIR = obj
 HEADERS = headers
@@ -35,3 +35,4 @@ $(OBJ_DIR)/mem_check.c.o: $(SRC_DIR)/mem_check.c
 .PHONY: clean
 clean:
 	@rm -rf $(OBJ_DIR)
+	@rm -rf $(TARGET)
