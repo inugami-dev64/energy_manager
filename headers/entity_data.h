@@ -35,7 +35,7 @@ typedef struct Date {
 typedef struct LogEntry {
     uint32_t log_id;
     uint32_t plant_no;
-    float daily_production;
+    float production;
     float avg_sale_price;
     Date date;
 } LogEntry;
@@ -44,9 +44,19 @@ typedef struct LogEntry {
 /// Structure for containing multiple daily log instances
 typedef struct PlantLogs {
     LogEntry *entries;
-    size_t cap;
+    size_t max_id;
     size_t n;
+    size_t cap;
 } PlantLogs;
+
+
+/// Structure for containing multiple log references accessed from
+/// PlantData structure
+typedef struct PlantLogRefs {
+    LogEntry **p_entries;
+    size_t n;
+    size_t cap;
+} PlantLogRefs;
 
 
 /// Structure for containing all power plant related information 
@@ -56,13 +66,15 @@ typedef struct PlantData {
     FuelType fuel;
     float rated_cap; // MW
     float avg_cost;
-    PlantLogs logs;
+    float avg_utililisation;
+    PlantLogRefs logs;
 } PlantData;
 
 
 /// Structure for containing all power plant instances
 typedef struct PowerPlants {
     PlantData *plants;
+    size_t max_id;
     size_t cap;
     size_t n;
 } PowerPlants;

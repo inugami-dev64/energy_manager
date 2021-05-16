@@ -26,10 +26,17 @@
 #define LINE_LENGTH_ERR(file, lc)                   fprintf(stderr, "Error, too long line in file %s, line %d\n", file, lc), \
                                                     exit(EXIT_FAILURE)
 
-#define LINE_VAL_C_ERR(file, lc)                    fprintf(stderr, "Error, too many values in file %s, line %d\n", file, lc), \
+#define LINE_GREATER_VAL_C_ERR(file, lc)            fprintf(stderr, "Error, too many values in file %s, line %d\n", file, lc), \
                                                     exit(EXIT_FAILURE)
 
 #define INCONSISTANT_FIELD_C_ERR(file, lc)          fprintf(stderr, "Error, CSV field count is not constant in file %s, line: %d\n", file, lc), \
+                                                    exit(EXIT_FAILURE)
+
+/// Data entry parsing errors
+#define INVALID_ARG_C(file)                         fprintf(stderr, "The record count in file '%s' does not match to the required record count for power plant information\n", file), \
+                                                    exit(EXIT_FAILURE)
+
+#define INVALID_DATE_FORMAT(file, date)             fprintf(stderr, "Invalid date format '%s' in file '%s', date must be presented in YYYY-MM-DD format", date, file), \
                                                     exit(EXIT_FAILURE)
 
 #endif

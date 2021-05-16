@@ -21,6 +21,7 @@
     #include <err_def.h>
 
     #define __DEFAULT_POWER_PLANT_CAP       16
+    #define __DEFAULT_LOG_CAP               32
     #define __MAX_SEP_C                     4
     #define __MAX_STR_VAL_C                 5
 
@@ -69,7 +70,29 @@ void __parseCSVRow(char *beg, char *end, char *file_name, uint32_t line, CsvRow 
 /// Parse all CSV rows and check if the csv table has constant amount of columns
 void __parseCSVRows(char *buf, size_t buf_len, char *file_name, CsvRow **p_rows, size_t *p_row_c);
 
+
+
+/// Check the current entry and return integer when possible
+int64_t __csvEntryRetrieveInteger(CsvEntry *p_entry);
+
+/// Check the current entry and return floating point number, when possible
+double __csvEntryRetrieveFloat(CsvEntry *p_entry);
+
+/// Check the current entry for string value and return it, when possible
+char *__csvEntryRetrieveString(CsvEntry *p_entry);
+
+/// Check the entry for string and try to parse fuel type out of it
+FuelType __csvCheckFuelType(CsvEntry *p_entry);
+
+/// Check the entry for string date format and try to parse it into Date structure
+Date __csvCheckDateType(char *file_name, CsvEntry *p_entry);
+
+
+
 /// High level function to parse all data from csv power plant file
 void parsePowerPlantFile(char *file_name, PowerPlants *p_plants);
+
+/// High level function to parse all logs from the csv logs file
+void parseLogsFile(char *file_name, PlantLogs *p_logs);
 
 #endif
