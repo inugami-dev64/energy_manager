@@ -2,7 +2,7 @@
  * File:        main.c
  * Author:      Karl-Mihkel Ott
  * Created      2021-05-13
- * Last edit:   2021-05-13
+ * Last edit:   2021-05-17
  * Description: Contains main and input polling functions
  */
 
@@ -12,18 +12,123 @@
 
 
 /// Poll user input
-void poll() {
-    // Input data buffer
-    char in_buf[__DEFAULT_BUF_LEN] = {};
+void poll(char *pow_file, char *log_file) {
+    // Parse and log power plants information
+    PowerPlants plants;
+    parsePowerPlantFile(pow_file, &plants);
 
-    printf("Welcome to energy manager program!\n"
-           "To view all available commands type 'help'\n");
+    // Parse and log power plant logs
+    PlantLogs logs;
+    parseLogsFile(log_file, &logs);
+
+    // Create commandline token map
+    Hashmap tokens = tokeniseUserInput();
+
+    // Create hashmap instances for power plant data and daily log data
+    Hashmap pow_map = createPowerPlantMap(&plants);
+    Hashmap log_map = createLogMap(&logs);
+
+    // Put log data into their corresponding PlantData instance
+    associateLogData(&plants, &logs, &pow_map);
+
+    // Input data buffer
+    char in_buf[__DEFAULT_BUF_LEN] = { 0 };
+
+    // Set the selected id as maximum possible
+    uint32_t selected = UINT32_MAX;
+
+    // Allocate resources for ncurses
+    printf("Welcome to energy manager program!\n"\
+           "To view all available commands type 'help'\n\n");
 
     // Main program loop
     while(true) {
-        printf("(energy_manager) ");
-        fflush(stdout);
+        // Print the energy manager input section prompt to line before end
+        if(selected == UINT32_MAX)
+            printf("(energy_manager) ");
+        else printf("(energy_manager:%d) ", selected);
+
+        // Get the user input into buffer
         fgets(in_buf, __DEFAULT_BUF_LEN, stdin);
+        in_buf[strlen(in_buf) - 1] = 0x00;
+
+        // Parse the input into enumeral value
+        uint32_t arg = UINT32_MAX;
+        UserInputAction act = parseUserInputAction(&tokens, in_buf, selected == UINT32_MAX ? 
+            false : true, &arg);
+
+        // Check the parsed action value and call appropriate functions
+        switch(act) {
+        // Unselected mode actions
+        case USER_INPUT_ACTION_U_SHOW_HELP:
+            showHelp(false);
+            break;
+
+        case USER_INPUT_ACTION_U_NEW_POWER_PLANT:
+            break;
+
+        case USER_INPUT_ACTION_U_LIST_PLANTS:
+            listPowerPlants(&plants);
+            break;
+
+        case USER_INPUT_ACTION_U_EDIT_POWER_PLANT:
+            editPowerPlant(&pow_map, arg);
+            break;
+
+        case USER_INPUT_ACTION_U_SHOW_LOGS:
+            listAllLogs(&logs);
+            break;
+
+        case USER_INPUT_ACTION_U_DELETE_POWER_PLANT:
+            deletePowerPlant(&plants, &pow_map, arg);
+            arg = 0;
+            break;
+
+        case USER_INPUT_ACTION_U_SELECT_POWER_PLANT:
+            selected = arg;
+            arg = 0;
+            break;
+
+        case USER_INPUT_ACTION_S_SHOW_HELP:
+            showHelp(true);
+            break;
+
+        case USER_INPUT_ACTION_S_LIST_LOGS:
+            listAllLogs(&logs);
+            break;
+
+        case USER_INPUT_ACTION_S_EDIT_LOG:
+            editLog(&log_map, arg);
+            break;
+
+        case USER_INPUT_ACTION_S_DELETE_LOG:
+            deleteLog(&logs, &log_map, arg);
+            break;
+
+        case USER_INPUT_ACTION_SAVE:
+            saveData(&plants, &logs, pow_file, log_file);
+            break;
+
+        case USER_INPUT_ACTION_EXIT:
+            // Clear hashmaps
+            destroyHashmap(&pow_map);
+            destroyHashmap(&log_map);
+            destroyHashmap(&tokens);
+
+            // For each power plant instance free the memory that was
+            // allocated for their log pointers
+            for(size_t i = 0; i < plants.n; i++)
+                free(plants.plants[i].logs.p_entries);
+            
+            // Free all memory that was allocated for storing plant and log data
+            free(plants.plants);
+            free(logs.entries);
+            return;
+
+        default:
+            printf("Unknown command '%s'\n", in_buf);
+            break;
+        }
     }
 }
 
@@ -34,29 +139,17 @@ int main(int argc, char *argv[]) {
     char pow_file[1024] = { 0 };
     printf("Enter power plant file name: ");
     fflush(stdout);
-    scanf("%s", pow_file);
+    fgets(pow_file, 1024, stdin);
+    pow_file[strlen(pow_file) - 1] = 0x00;
 
     // Read user input about log file
     char log_file[1024] = { 0 };
     printf("Enter power plant log file name: ");
     fflush(stdout);
-    scanf("%s", log_file);
+    fgets(log_file, 1024, stdin);
+    log_file[strlen(log_file) - 1] = 0x00;
 
-
-    // Parse and log power plants information
-    PowerPlants plants;
-    parsePowerPlantFile(pow_file, &plants);
-
-    // Parse and log power plant logs
-    PlantLogs logs;
-    parseLogsFile(log_file, &logs);
-
-    // Create hashmap instances for power plant data and daily log data
-    Hashmap pow_map = createPowerPlantMap(&plants);
-    Hashmap log_map = createLogMap(&logs);
-
-    // Put log data into their corresponding PlantData instance
-    associateLogData(&plants, &logs, &pow_map);
-
+    // Start input polling
+    poll(pow_file, log_file);
     return EXIT_SUCCESS;
 }

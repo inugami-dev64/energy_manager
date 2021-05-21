@@ -14,18 +14,18 @@
 #ifdef __ENERGY_MANAGER_C
     #include <stdio.h>
     #include <string.h>
+    #include <stdbool.h>
     #include <stdlib.h>
     #include <stdint.h>
 
     #include <hashmap.h>
     #include <mem_check.h>
-    #include <err_def.h>
     #include <entity_data.h>
-    #include <action_prompt.h>
+    #include <err_def.h>
+    #include <prompt.h>
 
     #define __DEFAULT_POWER_PLANT_LOG_C     16
-    #define __MAX_LOG_LINE                  256
-    #define __MAX_PLANT_FILE_LINE(max_name) __roundToBase2(82 + max_name)
+    #define __FUEL_TYPE_STR_MAX_LEN         32
 #endif
 
 /// Create a new hashmap instance for power plants
@@ -51,12 +51,29 @@ void newPowerPlant(PlantData *p_data, PowerPlants *p_plants, Hashmap *p_map);
 
 
 /// Create a new power plant log entry for specific power plant
-void newPowerPlantLog(LogEntry *entry, Hashmap *p_map);
+void newPowerPlantLog(LogEntry *entry, PlantLogs *p_logs, Hashmap *p_map);
 
 
-/// Write all data to their corresponding files
-void saveData(PowerPlants *p_plants, char *plant_file, char *log_file);
+/// Handle duplicate power plant values according to the specified duplicate handling action
+/// mdup is the duplicate entry that exists in the map
+/// udup is the duplicate value that would be pushed to the map
+void handleDuplicatePowerPlantEntries(DuplicateEntryAction action, Hashmap *p_map,
+    PowerPlants *p_plants, PlantData *mdup, PlantData *udup, uint32_t key);
 
 
+/// Handle duplicate log values according to the specified duplicate handling action
+/// mdup is the duplicate entry that exists in the map
+/// udup is the duplicate value that would be pushed to the map
+void handleDuplicateLogEntries(DuplicateEntryAction action, Hashmap *p_map,
+    PlantLogs *p_logs, LogEntry *mdup, LogEntry *udup, uint32_t key);
+
+
+/// Convert FuelType enumeral into appropriate string
+/// NOTE: Pointer to in-scope static char is returned
+char *fuelTypeToStr(FuelType tp);
+
+
+/// Convert string into appropriate FuelType instance
+FuelType strToFuelType(char *str);
 
 #endif

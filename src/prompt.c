@@ -11,7 +11,6 @@
 #include <prompt.h>
 
 
-
 /// Display the power plant entry data
 void __displayPowerPlantEntry(PlantData *p_data) {
     printf("\n-- Power Plant --\n");
@@ -126,9 +125,41 @@ DuplicateEntryAction __promptDuplicateAction() {
 }
 
 
+/// Convert string command into command enumeral
+static UserInputAction __convertStrInputToEnum(Hashmap *tokens, char *in_str, bool is_sel, size_t len) {
+    // Check if the command is mode independent
+    if(!len) return USER_INPUT_ACTION_UNKNOWN;
+    else if(!strncmp(in_str, SAVE, len))
+        return USER_INPUT_ACTION_SAVE;
+    else if(!strncmp(in_str, EXIT, len))
+        return USER_INPUT_ACTION_EXIT;
+
+    char buf[__DEFAULT_BUF_LEN] = { 0 };
+
+    // Check if the energy_manager has "selected" mode
+    if(is_sel) {
+        // Create a copy of the key with "selected" specifier
+        strncpy(buf, in_str, len);
+        sprintf(buf + len, "%s", SEL_SPECIFIER);
+        len += strlen(SEL_SPECIFIER);
+    }
+
+    else {
+        // Create a copy of the key with "unselected" specifier
+        strncpy(buf, in_str, len);
+        sprintf(buf + len, "%s", UNSEL_SPECIFIER);
+        len += strlen(UNSEL_SPECIFIER);
+    }
+
+    // Return the pointer value which should be castable to UserInputAction 
+    // enumeral
+    return (UserInputAction) ((uint64_t) findValue(tokens, buf, len));
+}
+
+
 /// Prompt the user about possible actions that can be taken, when
 /// duplicate power plant entries were found
-DuplicateEntryAction promptDuplicateEntries(PlantData *ent1, PlantData *ent2) {
+DuplicateEntryAction promptDuplicatePowerPlantEntries(PlantData *ent1, PlantData *ent2) {
     printf("The following power plant entities have the same id\n");
 
     // Print out the entities' information
@@ -151,4 +182,78 @@ DuplicateEntryAction promptDuplicateLogEntries(LogEntry *ent1, LogEntry *ent2) {
 
     // Return the user selected action value
     return __promptDuplicateAction();
+}
+
+
+/// Create a token hashmap for all possible user input data
+Hashmap tokeniseUserInput() {
+    Hashmap map = {};
+    newHashmap(&map, __roundToBase2(2 * USER_INPUT_ACTION_ENUM_C));
+
+    // Push unselected mode tokens into map
+    // PS! Action enumeral value will be stored as a pointer that must 
+    // never be dereferenced, instead the pointer's value should be used instead
+    pushToHashmap(&map, UNSEL_HELP UNSEL_SPECIFIER, strlen(UNSEL_HELP
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SHOW_HELP);
+    pushToHashmap(&map, UNSEL_NEW SEL_SPECIFIER, strlen(UNSEL_NEW
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_NEW_POWER_PLANT);
+    pushToHashmap(&map, UNSEL_LIST UNSEL_SPECIFIER, strlen(UNSEL_LIST
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_LIST_PLANTS);
+    pushToHashmap(&map, UNSEL_LOG UNSEL_SPECIFIER, strlen(UNSEL_LOG
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SHOW_LOGS);
+    pushToHashmap(&map, UNSEL_EDIT UNSEL_SPECIFIER, strlen(UNSEL_EDIT
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_EDIT_POWER_PLANT);
+    pushToHashmap(&map, UNSEL_DEL UNSEL_SPECIFIER, strlen(UNSEL_DEL
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_DELETE_POWER_PLANT);
+    pushToHashmap(&map, UNSEL_SEL UNSEL_SPECIFIER, strlen(UNSEL_SEL
+        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SELECT_POWER_PLANT);
+
+    // Push selected mode tokens into the map
+    pushToHashmap(&map, SEL_HELP SEL_SPECIFIER, strlen(SEL_HELP
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_SHOW_HELP);
+    pushToHashmap(&map, SEL_NEW SEL_SPECIFIER, strlen(SEL_NEW
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_NEW_LOG);
+    pushToHashmap(&map, SEL_LIST SEL_SPECIFIER, strlen(SEL_LIST
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_LIST_LOGS);
+    pushToHashmap(&map, SEL_EDIT SEL_SPECIFIER, strlen(SEL_EDIT
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_EDIT_LOG);
+    pushToHashmap(&map, SEL_DEL SEL_SPECIFIER, strlen(SEL_DEL
+        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_DELETE_LOG);
+
+    // Push mode independent tokens to the hashmap
+    pushToHashmap(&map, SAVE, strlen(SAVE), (void*) USER_INPUT_ACTION_SAVE);
+    pushToHashmap(&map, EXIT, strlen(EXIT), (void*) USER_INPUT_ACTION_EXIT);
+
+    return map;
+}
+
+
+/// Parse the user entry into enumeral
+UserInputAction parseUserInputAction(Hashmap *tokens, char *in_str, bool is_sel, uint32_t *out_arg) {
+    UserInputAction act;
+    
+    // Skip all separators at the beginning of the string
+    char *ptr = in_str;
+    char *end = in_str + strlen(in_str);
+    while(ptr < end && (*ptr == 0x20 || *ptr == 0x09))
+        ptr++;
+
+    // Find the end of the first word
+    char *word_end = strchr(ptr, 0x20);
+    word_end = !word_end ? end : word_end;
+
+    // Check if command argument value exists
+    if(word_end != end) {
+        // Skip all separators
+        char *arg_beg = word_end;
+        while(arg_beg < end && (*arg_beg == 0x20 || *arg_beg == 0x09))
+            arg_beg++;
+
+        // Set the argument value if possible
+        if(arg_beg < end)
+            *out_arg = atoi(arg_beg);
+    }
+    
+    // Find the requested action
+    return __convertStrInputToEnum(tokens, ptr, is_sel, word_end - ptr);
 }

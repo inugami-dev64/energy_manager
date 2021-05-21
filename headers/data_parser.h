@@ -60,32 +60,38 @@ typedef struct CsvRow {
 } CsvRow;
 
 
-/// Read all file data into char buffer
-void __readFileToBuffer(char *file_name, char **p_buf, size_t *p_len);
+#ifdef __DATA_PARSER_C
+    /// Read all file data into char buffer
+    static void __readFileToBuffer(char *file_name, char **p_buf, size_t *p_len);
 
-/// Parse a single CSV line
-/// Line size is given as parameters
-void __parseCSVRow(char *beg, char *end, char *file_name, uint32_t line, CsvRow *p_row);
-
-/// Parse all CSV rows and check if the csv table has constant amount of columns
-void __parseCSVRows(char *buf, size_t buf_len, char *file_name, CsvRow **p_rows, size_t *p_row_c);
+    /// Parse a single CSV line
+    /// Line size is given as parameters
+    static void __parseCSVRow(char *beg, char *end, char *file_name, uint32_t line, CsvRow *p_row);
 
 
+    /// Parse all CSV rows and check if the csv table has constant amount of columns
+    static void __parseCSVRows(char *buf, size_t buf_len, char *file_name, CsvRow **p_rows, size_t *p_row_c);
 
-/// Check the current entry and return integer when possible
-int64_t __csvEntryRetrieveInteger(CsvEntry *p_entry);
 
-/// Check the current entry and return floating point number, when possible
-double __csvEntryRetrieveFloat(CsvEntry *p_entry);
+    /// Check the current entry and return integer when possible
+    static int64_t __csvEntryRetrieveInteger(CsvEntry *p_entry);
 
-/// Check the current entry for string value and return it, when possible
-char *__csvEntryRetrieveString(CsvEntry *p_entry);
 
-/// Check the entry for string and try to parse fuel type out of it
-FuelType __csvCheckFuelType(CsvEntry *p_entry);
+    /// Check the current entry and return floating point number, when possible
+    static double __csvEntryRetrieveFloat(CsvEntry *p_entry);
 
-/// Check the entry for string date format and try to parse it into Date structure
-Date __csvCheckDateType(char *file_name, CsvEntry *p_entry);
+
+    /// Check the current entry for string value and return it, when possible
+    static char *__csvEntryRetrieveString(CsvEntry *p_entry);
+
+
+    /// Check the entry for string and try to parse fuel type out of it
+    static FuelType __csvCheckFuelType(CsvEntry *p_entry);
+
+
+    /// Check the entry for string date format and try to parse it into Date structure
+    static Date __csvCheckDateType(char *file_name, CsvEntry *p_entry);
+#endif
 
 
 

@@ -1,5 +1,4 @@
-/*
- * File:        main.h
+/* File:        main.h
  * Author:      Karl-Mihkel Ott
  * Created      2021-05-13
  * Last edit:   2021-05-13
@@ -14,19 +13,24 @@
     #include <stdlib.h>
     #include <stdbool.h>
     #include <stdio.h>
+    #include <ncurses.h>
+    #include <string.h>
+    #include <sys/ioctl.h>
     #include <stdint.h>
     
     #include <hashmap.h>
     #include <entity_data.h>
     #include <data_parser.h>
+    #include <prompt.h>
     #include <energy_manager.h>
+    #include <act_impl.h>
     
     #define __DEFAULT_BUF_LEN   1024
 #endif
 
 
 /// Poll user input
-void poll();
+void poll(char *pow_file, char *log_file);
 
 
 #endif

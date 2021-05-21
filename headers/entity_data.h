@@ -1,5 +1,4 @@
-/*
- * File:        entity_data.h
+/* File:        entity_data.h
  * Author:      Karl-Mihkel Ott
  * Created      2021-05-11
  * Last edit:   2021-05-11
@@ -13,13 +12,14 @@
 
 /// Enumeral values of the type of fuel used by the power plant
 typedef enum FuelType {
-    FUEL_TYPE_COAL          = 0,
-    FUEL_TYPE_SHALE_OIL     = 1,
-    FUEL_TYPE_GAS           = 2,
-    FUEL_TYPE_URANIUM       = 3,
-    FUEL_TYPE_WATER         = 4,
-    FUEL_TYPE_WIND          = 5,
-    FUEL_TYPE_GEOTHERMAL    = 6
+    FUEL_TYPE_UNKNOWN       = 0,
+    FUEL_TYPE_COAL          = 1,
+    FUEL_TYPE_SHALE_OIL     = 2,
+    FUEL_TYPE_GAS           = 3,
+    FUEL_TYPE_URANIUM       = 4,
+    FUEL_TYPE_WATER         = 5,
+    FUEL_TYPE_WIND          = 6,
+    FUEL_TYPE_GEOTHERMAL    = 7
 } FuelType;
 
 
