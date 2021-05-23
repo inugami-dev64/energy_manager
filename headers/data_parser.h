@@ -13,6 +13,7 @@
 #ifdef __DATA_PARSER_C
     #include <stdio.h>
     #include <string.h>
+    #include <stdbool.h>
     #include <stdlib.h>
     #include <stdint.h>
 
@@ -27,11 +28,6 @@
 
     // This is mainly needed for avoiding buffer overflows, when parsing a single line
     #define __MAX_LINE_SIZE                 4096
-
-    /// Boolean type declaration
-    typedef uint8_t bool;
-    #define true 1
-    #define false 0
 #endif
 
 /// Possible CSV data type specifiers

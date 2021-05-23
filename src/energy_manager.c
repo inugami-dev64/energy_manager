@@ -91,7 +91,14 @@ void associateLogData(PowerPlants *p_power_plants, PlantLogs *p_logs, Hashmap *p
 
         // Set the log value to its power plant entry
         p_data->logs.p_entries[p_data->logs.n] = p_logs->entries + i;
+        p_logs->entries[i].ref_ind = p_data->logs.n;
         p_data->logs.n++;
+    }
+
+    // For each power plant instance find its utilisation and average cost
+    for(size_t i = 0; i < p_power_plants->n; i++) {
+        calcAvgCost(p_power_plants->plants + i);
+        calcAvgUtilisation(p_power_plants->plants + i);
     }
 }
 
@@ -243,36 +250,4 @@ void handleDuplicateLogEntries (
     default: 
         break;
     }
-}
-
-
-/// Convert FuelType enumeral into appropriate string
-/// NOTE: Pointer to in-scope static char is returned
-char *fuelTypeToStr(FuelType tp) {
-    // Check the fueltype and return correct string
-    switch(tp) {
-        case FUEL_TYPE_COAL: return "coal";
-        case FUEL_TYPE_GAS: return "gas";
-        case FUEL_TYPE_GEOTHERMAL: return "geothermal";
-        case FUEL_TYPE_SHALE_OIL: return "shaleoil";
-        case FUEL_TYPE_URANIUM: return "uranium";
-        case FUEL_TYPE_WATER: return "water";
-        case FUEL_TYPE_WIND: return "wind";
-        default: return NULL;
-    }
-}
-
-
-/// Convert string into appropriate FuelType instance
-FuelType strToFuelType(char *str) {
-    // Check for the string value and return correct FuelType instance
-    if(!strcmp(str, "coal")) return FUEL_TYPE_COAL;
-    else if(!strcmp(str, "gas")) return FUEL_TYPE_GAS;
-    else if(!strcmp(str, "geothermal")) return FUEL_TYPE_GEOTHERMAL;
-    else if(!strcmp(str, "shaleoil")) return FUEL_TYPE_SHALE_OIL;
-    else if(!strcmp(str, "uranium")) return FUEL_TYPE_URANIUM;
-    else if(!strcmp(str, "water")) return FUEL_TYPE_WATER;
-    else if(!strcmp(str, "wind")) return FUEL_TYPE_WIND;
-
-    return FUEL_TYPE_UNKNOWN;
 }

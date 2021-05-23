@@ -2,7 +2,7 @@
  * File:        main.c
  * Author:      Karl-Mihkel Ott
  * Created      2021-05-13
- * Last edit:   2021-05-17
+ * Last edit:   2021-05-23
  * Description: Contains main and input polling functions
  */
 
@@ -36,6 +36,7 @@ void poll(char *pow_file, char *log_file) {
 
     // Set the selected id as maximum possible
     uint32_t selected = UINT32_MAX;
+    ListSortMode sort_mode = LIST_SORT_MODE_UNKNOWN;
 
     // Allocate resources for ncurses
     printf("Welcome to energy manager program!\n"\
@@ -54,8 +55,9 @@ void poll(char *pow_file, char *log_file) {
 
         // Parse the input into enumeral value
         uint32_t arg = UINT32_MAX;
-        UserInputAction act = parseUserInputAction(&tokens, in_buf, selected == UINT32_MAX ? 
-            false : true, &arg);
+        sort_mode = LIST_SORT_MODE_UNKNOWN;
+        UserInputAction act = parseUserInputAction(&tokens, in_buf, (selected == UINT32_MAX ? 
+            false : true), &sort_mode, &arg);
 
         // Check the parsed action value and call appropriate functions
         switch(act) {
@@ -65,10 +67,11 @@ void poll(char *pow_file, char *log_file) {
             break;
 
         case USER_INPUT_ACTION_U_NEW_POWER_PLANT:
+            createNewPowerPlant(&plants, &pow_map);
             break;
 
         case USER_INPUT_ACTION_U_LIST_PLANTS:
-            listPowerPlants(&plants);
+            listPowerPlants(&plants, sort_mode);
             break;
 
         case USER_INPUT_ACTION_U_EDIT_POWER_PLANT:
@@ -76,33 +79,42 @@ void poll(char *pow_file, char *log_file) {
             break;
 
         case USER_INPUT_ACTION_U_SHOW_LOGS:
-            listAllLogs(&logs);
+            listAllLogs(&logs, sort_mode);
             break;
 
         case USER_INPUT_ACTION_U_DELETE_POWER_PLANT:
             deletePowerPlant(&plants, &pow_map, arg);
-            arg = 0;
             break;
 
         case USER_INPUT_ACTION_U_SELECT_POWER_PLANT:
-            selected = arg;
-            arg = 0;
+            selectionCheck(&selected, arg, &pow_map);
             break;
 
         case USER_INPUT_ACTION_S_SHOW_HELP:
             showHelp(true);
             break;
 
-        case USER_INPUT_ACTION_S_LIST_LOGS:
-            listAllLogs(&logs);
+        case USER_INPUT_ACTION_S_LIST_LOGS: {
+            PlantData *data = (PlantData*) findValue(&pow_map, &selected, sizeof(uint32_t));
+            listPowerPlantLogs(data, sort_mode);
             break;
+        }
 
         case USER_INPUT_ACTION_S_EDIT_LOG:
-            editLog(&log_map, arg);
+            editLog(&pow_map, &log_map, selected, arg);
             break;
 
+        case USER_INPUT_ACTION_S_NEW_LOG: {
+            newLog(&pow_map, &log_map, &plants, &logs, selected);
+            break;
+        }
+
         case USER_INPUT_ACTION_S_DELETE_LOG:
-            deleteLog(&logs, &log_map, arg);
+            deleteLog(&logs, &pow_map, &log_map, selected, arg);
+            break;
+
+        case USER_INPUT_ACTION_S_UNSEL_POWER_PLANT:
+            selected = UINT32_MAX;
             break;
 
         case USER_INPUT_ACTION_SAVE:
@@ -131,7 +143,6 @@ void poll(char *pow_file, char *log_file) {
         }
     }
 }
-
 
 
 int main(int argc, char *argv[]) {

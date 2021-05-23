@@ -12,6 +12,183 @@
 #include <act_impl.h>
 
 
+/// Perform sorting on power plant data according to the list sorting mode
+void __sortPowerPlantRefs(PowerPlantRefs *p_refs, ListSortMode smode) {
+    // If no plants are found return
+    if(!p_refs->n) return;
+
+    // Check if sorting should be done for power plants
+    switch(smode) {
+    case LIST_SORT_MODE_POW_UTIL_DECR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, avg_utilisation), sizeof(PlantData*),
+            true, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_UTIL_INCR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, avg_utilisation), sizeof(PlantData*),
+            false, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_ID_INCR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, no), sizeof(PlantData*),
+            false, SORT_VALUE_TYPE_UINT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_ID_DECR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, no), sizeof(PlantData*), 
+            true, SORT_VALUE_TYPE_UINT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_CAP_INCR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, rated_cap), sizeof(PlantData*), 
+            false, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_CAP_DECR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, rated_cap), sizeof(PlantData*), 
+            true, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_COST_INCR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, avg_cost), sizeof(PlantData*),
+            false, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_POW_COST_DECR:
+        mergesort(p_refs->p_plants, offsetof(PlantData, avg_cost), sizeof(PlantData*), 
+            true, SORT_VALUE_TYPE_FLOAT32, true, 0, p_refs->n - 1);
+        break;
+
+    default: 
+        break;
+    }
+}
+
+
+/// Perform required sorting on logs according to the list sorting mode
+void __sortLogs(PlantLogs *p_logs, ListSortMode smode) {
+    // If no logs are found return
+    if(!p_logs->n) return;
+
+    switch(smode) {
+    case LIST_SORT_MODE_LOG_ID_INCR:
+        mergesort(p_logs->entries, offsetof(LogEntry, log_id), sizeof(LogEntry),
+            false, SORT_VALUE_TYPE_UINT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_ID_DECR:
+        mergesort(p_logs->entries, offsetof(LogEntry, log_id), sizeof(LogEntry),
+            true, SORT_VALUE_TYPE_UINT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PLANT_ID_INCR:
+        mergesort(p_logs->entries, offsetof(LogEntry, plant_no), sizeof(LogEntry),
+            false, SORT_VALUE_TYPE_UINT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PLANT_ID_DECR:
+        mergesort(p_logs->entries, offsetof(LogEntry, plant_no), sizeof(LogEntry),
+            true, SORT_VALUE_TYPE_UINT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PRODUCTION_INCR:
+        mergesort(p_logs->entries, offsetof(LogEntry, production), sizeof(LogEntry),
+            false, SORT_VALUE_TYPE_FLOAT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PRODUCTION_DECR:
+        mergesort(p_logs->entries, offsetof(LogEntry, production), sizeof(LogEntry),
+            true, SORT_VALUE_TYPE_FLOAT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_SALE_PRICE_INCR:
+        mergesort(p_logs->entries, offsetof(LogEntry, avg_sale_price), sizeof(LogEntry),
+            false, SORT_VALUE_TYPE_FLOAT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_SALE_PRICE_DECR:
+        mergesort(p_logs->entries, offsetof(LogEntry, avg_sale_price), sizeof(LogEntry),
+            true, SORT_VALUE_TYPE_FLOAT32, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_DATE_INCR:
+        mergesort(p_logs->entries, offsetof(LogEntry, date), sizeof(LogEntry),
+            false, SORT_VALUE_TYPE_DATE, false, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_DATE_DECR:
+        mergesort(p_logs->entries, offsetof(LogEntry, date), sizeof(LogEntry),
+            true, SORT_VALUE_TYPE_DATE, false, 0, p_logs->n - 1);
+        break;
+
+    default: 
+        break;
+    }
+}
+
+
+/// Perform required sorting on logs according to the list sorting mode
+void __sortLogRefs(PlantLogRefs *p_logs, ListSortMode smode) {
+    // If no logs are found return
+    if(!p_logs->n) return;
+
+    switch(smode) {
+    case LIST_SORT_MODE_LOG_ID_INCR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, log_id), sizeof(LogEntry*),
+            false, SORT_VALUE_TYPE_UINT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_ID_DECR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, log_id), sizeof(LogEntry*),
+            true, SORT_VALUE_TYPE_UINT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PLANT_ID_INCR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, plant_no), sizeof(LogEntry*),
+            false, SORT_VALUE_TYPE_UINT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PLANT_ID_DECR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, plant_no), sizeof(LogEntry*),
+            true, SORT_VALUE_TYPE_UINT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PRODUCTION_INCR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, production), sizeof(LogEntry*),
+            false, SORT_VALUE_TYPE_FLOAT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_PRODUCTION_DECR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, production), sizeof(LogEntry*),
+            true, SORT_VALUE_TYPE_FLOAT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_SALE_PRICE_INCR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, avg_sale_price), sizeof(LogEntry*),
+            false, SORT_VALUE_TYPE_FLOAT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_SALE_PRICE_DECR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, avg_sale_price), sizeof(LogEntry*),
+            true, SORT_VALUE_TYPE_FLOAT32, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_DATE_INCR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, date), sizeof(LogEntry*),
+            false, SORT_VALUE_TYPE_DATE, true, 0, p_logs->n - 1);
+        break;
+
+    case LIST_SORT_MODE_LOG_DATE_DECR:
+        mergesort(p_logs->p_entries, offsetof(LogEntry, date), sizeof(LogEntry*),
+            true, SORT_VALUE_TYPE_DATE, true, 0, p_logs->n - 1);
+        break;
+
+    default: 
+        break;
+    }
+}
+
+
 /// Print out help text
 void showHelp(bool is_sel) {
     // Check if selected mode text or unselected mode text should be shown
@@ -20,62 +197,236 @@ void showHelp(bool is_sel) {
 }
 
 
-/// List all currently available power plants according to
-/// the average utilisation percentage
-void listPowerPlants(PowerPlants *p_plants) {
-    // Find the terminal size, which is needed for formating the data 
-    struct winsize ws;
-    ioctl(STDOUT_FILENO, TIOCGWINSZ, &ws);
-
-    // Create a power plant separator 
-    char sep[ws.ws_col + 1];
-    memset(sep, '_', ws.ws_col);
-    sep[ws.ws_col] = 0x00;
-
-    // Print the table heading information
-    printf(" | ID | Name | Fuel | Rated cap | Average cost | Average utilisation | \n");
-
-    // For each power plant, show its information
-    for(size_t i = 0; i < p_plants->n; i++) {
-        // Create a buffer for string data
-        char buf[4096] = { 0 };
-        sprintf(buf, "  %d.  |  %s  |  uranium  |  %.2f  |  %.2f  |  %.2f  ",
-            p_plants->plants[i].no, p_plants->plants[i].name, p_plants->plants[i].rated_cap,
-            p_plants->plants[i].avg_cost, p_plants->plants[i].avg_utililisation);  
-
-        // Print the output data to stdout
-        printf("%s\n%s\n%s\n", sep, buf, sep);
-    }
+/// Ask information about the new power plant instance from the user
+/// and create a new instance
+void createNewPowerPlant(PowerPlants *p_plants, Hashmap *p_map) {
+    PlantData user_data = promptNewPowerPlant(&p_plants->max_id, p_map);
+    newPowerPlant(&user_data, p_plants, p_map);
 }
 
 
-/// List all written logs in date order
-void listAllLogs(PlantLogs *p_logs) {
+/// List all currently available power plants according to
+/// the average utilisation percentage
+void listPowerPlants(PowerPlants *p_plants, ListSortMode smode) {
+    // Allocate memory for power plant references
+    PowerPlantRefs refs = { .n = p_plants->n, .cap = p_plants->cap };
+    refs.p_plants = (PlantData**) calloc(p_plants->cap, sizeof(PlantData*));
+
+    // Copy all pointers to newly allocated power plant reference array
+    for(size_t i = 0; i < refs.n; i++)
+        refs.p_plants[i] = &p_plants->plants[i];
+
+    // Sort power plants if necessary
+    __sortPowerPlantRefs(&refs, smode);
+    displayPowerPlants(&refs);
+
+    // Free allocated memory
+    free(refs.p_plants);
+}
+
+
+/// List all written logs according to specified sort mode
+void listAllLogs(PlantLogs *p_logs, ListSortMode smode) {
+    // Allocate memory for log references
+    PlantLogRefs refs = { 0 };
+    refs.cap = p_logs->cap;
+    refs.n = p_logs->n;
+    refs.p_entries = (LogEntry**) calloc(p_logs->cap, sizeof(LogEntry*));
+
+    // Populate references' array with new log data
+    for(size_t i = 0; i < refs.n; i++)
+        refs.p_entries[i] = p_logs->entries + i;
+
+    // Sort all data according to the given sort mode
+    __sortLogRefs(&refs, smode);
+    displayLogData(&refs);
+
+    // Free the reference buffer
+    free(refs.p_entries);
 }
 
 
 /// List all logs that belong to the power plant
-void listPowePlantLogs(PlantData *plant) {
+void listPowerPlantLogs(PlantData *plant, ListSortMode smode) {
+    // Sort data and display it to stdout
+    __sortLogRefs(&plant->logs, smode);
+    displayLogData(&plant->logs);
 }
 
 
 /// Edit power plant properties
 void editPowerPlant(Hashmap *plant_map, uint32_t index) {
+    // Find the PlantData reference
+    PlantData *data = (PlantData*) findValue(plant_map, &index, sizeof(uint32_t));
+        
+    // Check if data exists
+    if(!data) {
+        printf("Failed to edit power plant with id %u\n"
+               "Power plant not available\n\n", index);
+        return;
+    }
+
+    promptEditPowerPlant(data);
+}
+
+
+/// Create a new log for certain power plant instance
+void newLog (
+    Hashmap *pow_map, 
+    Hashmap *log_map, 
+    PowerPlants *p_plants, 
+    PlantLogs *p_logs, 
+    uint32_t sel_id
+) {
+    LogEntry log = promptNewLogEntry(log_map, &p_logs->max_id, sel_id);
+
+    // Push the log entry to PlantLogs array
+    LogEntry *prev_val = p_logs->entries;
+    reallocCheck((void**) &p_logs->entries, sizeof(LogEntry), p_logs->n + 1,
+        &p_logs->cap); 
+
+    // Check if reallocation happended and memory addresses should be adjusted
+    if(p_logs->entries - prev_val) {
+        size_t delta = p_logs->entries - prev_val;
+        // For each power plant entry adjust its log memory addresses
+        for(size_t i = 0; i < p_plants->n; i++) {
+            for(size_t j = 0; j < p_plants->plants[i].logs.n; j++)
+                p_plants->plants[i].logs.p_entries[j] += delta;
+        }
+
+        // For each log replace its value in hashmap
+        for(size_t i = 0; i < p_logs->n; i++) {
+            popFromHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t));
+            pushToHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t),
+                p_logs->entries + i);
+        }
+    }
+
+    
+    p_logs->entries[p_logs->n] = log;
+    p_logs->n++;
+
+    // Push log entry to hashmap
+    pushToHashmap(log_map, &log.log_id, sizeof(uint32_t), 
+        p_logs->entries + p_logs->n - 1);
+
+    // Retrieve associated power plant instance and push new LogEntry value
+    // to power plant logs' data
+    PlantData *p_pow_data = (PlantData*) findValue(pow_map, &sel_id, sizeof(uint32_t));
+
+    reallocCheck((void**) &p_pow_data->logs.p_entries, sizeof(LogEntry*), p_pow_data->logs.n,
+        &p_pow_data->logs.cap);
+    p_pow_data->logs.p_entries[p_pow_data->logs.n] = p_logs->entries + p_logs->n - 1;
+    p_pow_data->logs.n++;
+
+    // Recalculate average cost and utilisation
+    calcAvgCost(p_pow_data);
+    calcAvgUtilisation(p_pow_data);
 }
 
 
 /// Edit the power plant log data
-void editLog(Hashmap *log_map, uint32_t index) {
+void editLog(Hashmap *plant_map, Hashmap *log_map, uint32_t sel_id, uint32_t index) {
+    // Retrieve the LogEntry reference from the map 
+    LogEntry *log = findValue(log_map, &index, sizeof(uint32_t));
+
+    // Check if the retrieval was successful
+    if(!log || log->plant_no != sel_id) {
+        printf("Cannot edit log entry with ID %u\n"\
+               "Log not available\n", index);
+        return;
+    }
+
+    promptEditLog(log);
+
+    // Find the associated plant data and update its average cost 
+    // and utilisation
+    PlantData *plant = (PlantData*) findValue(plant_map, &log->plant_no, sizeof(uint32_t));
+    calcAvgUtilisation(plant);
+    calcAvgCost(plant);
 }
 
 
 /// Delete a power plant entry
 void deletePowerPlant(PowerPlants *p_plants, Hashmap *plant_map, uint32_t index) {
+    PlantData *p_pop_plant = (PlantData*) popFromHashmap(plant_map, &index, sizeof(uint32_t));
+
+    // Check if no elements were found in the map
+    if(!p_pop_plant) {
+        printf("Cannot delete power plant entry with id %u\n"\
+               "Power plant not available\n\n", index);
+        return;
+    }
+
+    // Free memory allocated for log instances
+    free(p_pop_plant->logs.p_entries);
+
+    // Find the memory area index in array
+    size_t a_ind = p_pop_plant - p_plants->plants; 
+
+    // For each element after the popped plant instance, shift the elements in array to left
+    for(size_t i = a_ind + 1; i < p_plants->n; i++) {
+        // Pop the previous reference from the map and push the new one
+        PlantData *data = (PlantData*) popFromHashmap(plant_map, &p_plants->plants[i].no,
+            sizeof(uint32_t));
+        p_plants->plants[i - 1] = p_plants->plants[i];
+        pushToHashmap(plant_map, &p_plants->plants[i - 1].no, sizeof(uint32_t),
+            p_plants->plants + i - 1);
+    }
+
+    memset(p_plants->plants + p_plants->n - 1, 0, sizeof(PlantData));
+    p_plants->n--;
 }
 
 
 /// Delete a log entry
-void deleteLog(PlantLogs *p_logs, Hashmap *log_map, uint32_t index) {
+void deleteLog(PlantLogs *p_logs, Hashmap *pow_map, Hashmap *log_map, uint32_t sel_id, uint32_t index) {
+    LogEntry *del_entry = (LogEntry*) findValue(log_map, &index, sizeof(uint32_t));
+
+    // Check if no entries were found in the map
+    if(!del_entry || del_entry->plant_no != sel_id) {
+        printf("Cannot delete log entry with id %u\n"\
+               "Log entry not available\n\n", index);
+        return;
+    }
+    
+    // Find the memory area index in array
+    size_t a_ind = del_entry - p_logs->entries;
+
+    // Retrieve the associated plant data instance
+    PlantData *p_data = (PlantData*) findValue(pow_map, &del_entry->plant_no, sizeof(uint32_t));
+
+    // For each element after the popped value, shift elements to the left
+    for(size_t i = a_ind + 1; i < p_logs->n; i++) {
+        // Pop the previous reference from the hashmap and push it back with
+        // correct pointer value
+        LogEntry *p_entry = (LogEntry*) popFromHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t));
+        p_logs->entries[i - 1] = p_logs->entries[i];
+        pushToHashmap(log_map, &p_logs->entries[i - 1].log_id, sizeof(uint32_t), 
+            p_logs->entries + i - 1);
+    }
+       
+    // For each element after the invalid reference, shift the references to the left
+    for(size_t i = del_entry->ref_ind + 1; i < p_data->logs.n; i++)
+        p_data->logs.p_entries[i - 1] = p_data->logs.p_entries[i];
+
+    // Set the deprecated values to zero
+    memset(p_data->logs.p_entries + p_data->logs.n - 1, 0, sizeof(LogEntry*));
+    memset(p_logs->entries + p_logs->n - 1, 0, sizeof(LogEntry));
+    p_logs->n--;
+    p_data->logs.n--;
+}
+
+
+/// Check if the user provided selection id is available for selection
+void selectionCheck(uint32_t *p_sel_val, uint32_t arg, Hashmap *p_map) {
+    // Check if argument value is a valid key value in the given map
+    if(!findValue(p_map, &arg, sizeof(uint32_t))) {
+        printf("Cannot select power plant with id %u\n"
+               "Power plant not available\n", arg);
+    }
+
+    else *p_sel_val = arg;
 }
 
 
@@ -156,5 +507,5 @@ void saveData (
     free(plant_buf);
     free(log_buf);
 
-    printf("Written buffer to files '%s' and '%s'!\n", plants_file, logs_file);
+    printf("Saved to files '%s' and '%s'!\n", plants_file, logs_file);
 }

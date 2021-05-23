@@ -20,10 +20,11 @@
     
     #include <hashmap.h>
     #include <entity_data.h>
+    #include <algo.h>
+    #include <act_impl.h>
     #include <data_parser.h>
     #include <prompt.h>
     #include <energy_manager.h>
-    #include <act_impl.h>
     
     #define __DEFAULT_BUF_LEN   1024
 #endif

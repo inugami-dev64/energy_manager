@@ -37,6 +37,7 @@ typedef struct LogEntry {
     uint32_t plant_no;
     float production;
     float avg_sale_price;
+    size_t ref_ind;
     Date date;
 } LogEntry;
 
@@ -66,7 +67,7 @@ typedef struct PlantData {
     FuelType fuel;
     float rated_cap; // MW
     float avg_cost;
-    float avg_utililisation;
+    float avg_utilisation;
     PlantLogRefs logs;
 } PlantData;
 
@@ -78,5 +79,13 @@ typedef struct PowerPlants {
     size_t cap;
     size_t n;
 } PowerPlants;
+
+
+/// Structure for storing 
+typedef struct PowerPlantRefs {
+    PlantData **p_plants;
+    size_t cap;
+    size_t n;
+} PowerPlantRefs;
 
 #endif

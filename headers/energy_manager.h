@@ -19,8 +19,10 @@
     #include <stdint.h>
 
     #include <hashmap.h>
-    #include <mem_check.h>
     #include <entity_data.h>
+    #include <algo.h>
+    #include <act_impl.h>
+    #include <mem_check.h>
     #include <err_def.h>
     #include <prompt.h>
 
@@ -66,14 +68,5 @@ void handleDuplicatePowerPlantEntries(DuplicateEntryAction action, Hashmap *p_ma
 /// udup is the duplicate value that would be pushed to the map
 void handleDuplicateLogEntries(DuplicateEntryAction action, Hashmap *p_map,
     PlantLogs *p_logs, LogEntry *mdup, LogEntry *udup, uint32_t key);
-
-
-/// Convert FuelType enumeral into appropriate string
-/// NOTE: Pointer to in-scope static char is returned
-char *fuelTypeToStr(FuelType tp);
-
-
-/// Convert string into appropriate FuelType instance
-FuelType strToFuelType(char *str);
 
 #endif

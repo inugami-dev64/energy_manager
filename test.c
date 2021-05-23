@@ -1,12 +1,18 @@
-#include <ncurses.h>
+#include <stdlib.h>
+#include <stdint.h>
+#include <stdio.h>
+#include <stdbool.h>
+#include <algo.h>
 
-int main()
-{	
-	initscr();			/* Start curses mode 		  */
-	printw("Hello World !!!");	/* Print Hello World		  */
-	refresh();			/* Print it on to the real screen */
-	getch();			/* Wait for user input */
-	endwin();			/* End curses mode		  */
+#define LEN(arr) sizeof(arr) / sizeof(arr[0])
 
-	return 0;
+int main() {
+    float cont[] = { 16.2, 1.1, 901.91, 23.13, 5.193, 6.135, 251.083, 12384, 600.32 };
+    mergesort(cont, 0, sizeof(float), false, true, 0, LEN(cont) - 1);
+
+    // Print the array contents to stdout
+    for(size_t i = 0; i < LEN(cont); i++)
+        printf("%f\n", cont[i]);
+
+	return EXIT_SUCCESS;
 }

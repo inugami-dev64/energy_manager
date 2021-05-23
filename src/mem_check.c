@@ -43,7 +43,69 @@ void reallocCheck(void **p_data, size_t size, size_t req_n, size_t *p_cap) {
             fprintf(stderr, "Failed reallocation");
             exit(EXIT_FAILURE);
         }
-
         (*p_data) = tmp;
     }
+}
+
+
+/// Check if the given memory area contains only ascii numbers
+/// Returns 1 if the memory area contains only ascii numbers and 0 otherwise
+bool numcheck(char *data, size_t len) {
+    // For each byte in the memory area check its value
+    for(size_t i = 0; i < len; i++) {
+        if((data[i] < '0' || data[i] > '9') && data[i] != ' ')
+            return false;
+    }
+
+    return true;
+}
+
+
+/// Check if the given memory area contains only ascii numbers and / or '.'
+/// Returns 1 if the memory area is float compatible, 0 otherwise
+bool floatcheck(char *data, size_t len) {
+    int dot_c = 0;
+
+    // For each byte in the memory area check its value
+    for(size_t i = 0; i < len; i++) {
+        if((data[i] < '0' || data[i] > '9') && data[i] != ' ' && 
+           data[i] != '.' || dot_c > 1)
+            return false;
+        else if(data[i] == '.')
+            dot_c++;
+    }
+
+    return true;
+}
+
+
+/// Convert FuelType enumeral into appropriate string
+/// NOTE: Pointer to in-scope static char is returned
+char *fuelTypeToStr(FuelType tp) {
+    // Check the fueltype and return correct string
+    switch(tp) {
+        case FUEL_TYPE_COAL:        return "coal";
+        case FUEL_TYPE_GAS:         return "gas";
+        case FUEL_TYPE_GEOTHERMAL:  return "geothermal";
+        case FUEL_TYPE_SHALE_OIL:   return "shaleoil";
+        case FUEL_TYPE_URANIUM:     return "uranium";
+        case FUEL_TYPE_WATER:       return "water";
+        case FUEL_TYPE_WIND:        return "wind";
+        default:                    return NULL;
+    }
+}
+
+
+/// Convert string into appropriate FuelType instance
+FuelType strToFuelType(char *str) {
+    // Check for the string value and return correct FuelType instance
+    if(!strcmp(str, "coal")) return FUEL_TYPE_COAL;
+    else if(!strcmp(str, "gas")) return FUEL_TYPE_GAS;
+    else if(!strcmp(str, "geothermal")) return FUEL_TYPE_GEOTHERMAL;
+    else if(!strcmp(str, "shaleoil")) return FUEL_TYPE_SHALE_OIL;
+    else if(!strcmp(str, "uranium")) return FUEL_TYPE_URANIUM;
+    else if(!strcmp(str, "water")) return FUEL_TYPE_WATER;
+    else if(!strcmp(str, "wind")) return FUEL_TYPE_WIND;
+
+    return FUEL_TYPE_UNKNOWN;
 }

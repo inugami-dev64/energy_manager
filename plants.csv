@@ -1,4 +1,3 @@
-112,"Sosniy Bor nuclear power plant","gas",50000.000000
-121,"Narva shale oil power plant","coal",200.000000
-131,"Kükametsa hydroelectric power plant","uranium",50.000000
-159,"Chernobyl nuclear power plant","gas",0.000000
+112,"Sosniy Bor nuclear power plant","uranium",100.000000
+121,"Narva shale oil power plant","shaleoil",50.000000
+131,"Kükametsa hydroelectric power plant","water",50.000000

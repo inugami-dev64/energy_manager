@@ -35,9 +35,10 @@ typedef enum UserInputAction {
     USER_INPUT_ACTION_S_LIST_LOGS               = 10,
     USER_INPUT_ACTION_S_EDIT_LOG                = 11,
     USER_INPUT_ACTION_S_DELETE_LOG              = 12,
-    USER_INPUT_ACTION_EXIT                      = 13,
-    USER_INPUT_ACTION_SAVE                      = 14,
-    USER_INPUT_ACTION_ENUM_C                    = 15
+    USER_INPUT_ACTION_S_UNSEL_POWER_PLANT       = 13,
+    USER_INPUT_ACTION_EXIT                      = 14,
+    USER_INPUT_ACTION_SAVE                      = 15,
+    USER_INPUT_ACTION_ENUM_C                    = 16
 } UserInputAction;
 
 
@@ -46,11 +47,16 @@ typedef enum UserInputAction {
     #include <stdbool.h>
     #include <stdio.h>
     #include <stdint.h>
+    #include <time.h>
+    #include <unistd.h>
+    #include <sys/ioctl.h>
     #include <string.h>
 
     #include <hashmap.h>
-    #include <mem_check.h>
     #include <entity_data.h>
+    #include <algo.h>
+    #include <act_impl.h>
+    #include <mem_check.h>
 
     /// Display the power plant entry data
     static void __displayPowerPlantEntry(PlantData *p_data);
@@ -58,12 +64,6 @@ typedef enum UserInputAction {
 
     /// Display log entry data, along with the name and id of the power plant it belongs to
     static void __displayLogEntry(LogEntry *p_entry);
-
-
-    /// Format date from Date structure into string yyyy-mm-dd format
-    /// NOTE: This function returns a pointer to stack allocated memory area,
-    /// which gets overwritten with every function call
-    static char *__formatDate(Date *p_date);
 
     
     /// Prompt user to solve duplicate instances
@@ -90,14 +90,63 @@ typedef enum UserInputAction {
     #define SEL_LIST            "list"
     #define SEL_EDIT            "edit"
     #define SEL_DEL             "delete"
+    #define SEL_UNSEL           "unsel"
     #define SEL_SPECIFIER       "_s"
 
     /// Mode independent commands
     #define SAVE                "save"
     #define EXIT                "exit"
 
-    #define __DEFAULT_BUF_LEN       256
+    #define __DEFAULT_BUF_SIZE          4096
+    #define __DEFAULT_SMALL_BUF_SIZE    64
+    #define __DEFAULT_NAME_LEN          1024
+
+    /// Create a table separator, that is termwidth wide and the string 
+    /// consists of underscores 
+    char *__mkTableSeparator();
+
+
+    /********** New powerplant creation prompts *********/
+
+    /// Prompt the user about new power plant fuel type
+    FuelType __promptNewPowerPlantFuelType(FuelType *old);
+
+
+    /// Prompt the user about new power plant name
+    char *__promptNewPowerPlantNameValue(char *old);
+
+
+    /********** New log creation prompts **********/
+
+    /// Prompt the user about log's date info
+    Date __promptNewLogDate(Date *old);
+
+
+    /********** Generic prompts ***********/
+
+    /// Prompt the user until he enters correct floating point value
+    float __promptFloatValue(char *msg, float *old);
+    
+
+    /// Prompt the user until he enters correct id
+    uint32_t __promptIdValue(char *msg, size_t *p_max_id, Hashmap *p_map);
 #endif
+
+
+/******** Data display functions *********/
+
+/// Display log data for each given log
+void displayLogData(PlantLogRefs *p_refs);
+
+
+/// Display power plant data for each given power plant
+void displayPowerPlants(PowerPlantRefs *p_refs);
+
+
+/// Format date from Date structure into string yyyy-mm-dd format
+/// NOTE: This function returns a pointer to stack allocated memory area,
+/// which gets overwritten with every function call
+char *formatDate(Date *p_date);
 
 
 /// Prompt the user about possible actions that can be taken, when
@@ -115,5 +164,22 @@ Hashmap tokeniseUserInput();
 
 
 /// Parse the user entry into enumeral
-UserInputAction parseUserInputAction(Hashmap *tokens, char *in_str, bool is_sel, uint32_t *out_arg);
+UserInputAction parseUserInputAction(Hashmap *tokens, char *in_str, bool is_sel, 
+    ListSortMode *p_sort, uint32_t *out_arg);
+
+
+/// Prompt the user for information about a new power plant instance
+PlantData promptNewPowerPlant(size_t *p_max_id, Hashmap *p_map);
+
+
+/// Prompt the user for information about editing a power plant instance
+void promptEditPowerPlant(PlantData *data);
+
+
+/// Prompt the user for information about editing a log instance
+void promptEditLog(LogEntry *log);
+
+
+/// Prompt the user to create a new log entry
+LogEntry promptNewLogEntry(Hashmap *p_map, size_t *p_max_id, uint32_t sel_id);
 #endif
