@@ -14,11 +14,11 @@
 /// Poll user input
 void poll(char *pow_file, char *log_file) {
     // Parse and log power plants information
-    PowerPlants plants;
+    PowerPlants plants = { 0 };
     parsePowerPlantFile(pow_file, &plants);
 
     // Parse and log power plant logs
-    PlantLogs logs;
+    PlantLogs logs = { 0 };
     parseLogsFile(log_file, &logs);
 
     // Create commandline token map
@@ -128,9 +128,11 @@ void poll(char *pow_file, char *log_file) {
             destroyHashmap(&tokens);
 
             // For each power plant instance free the memory that was
-            // allocated for their log pointers
-            for(size_t i = 0; i < plants.n; i++)
+            // allocated for their log pointers and name
+            for(size_t i = 0; i < plants.n; i++) {
+                free(plants.plants[i].name);
                 free(plants.plants[i].logs.p_entries);
+            }
             
             // Free all memory that was allocated for storing plant and log data
             free(plants.plants);

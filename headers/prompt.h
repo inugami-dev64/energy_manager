@@ -97,6 +97,32 @@ typedef enum UserInputAction {
     #define SAVE                "save"
     #define EXIT                "exit"
 
+    /// Structure for specifying all differenct sorting modes
+    typedef struct __SortDef {
+        char *str_mode;
+        ListSortMode sort_modes[2];
+    } __SortDef;
+
+
+    /// Unselected sort mode specifiers
+    static const __SortDef __unsel_sort_modes[] = {
+        /* string keyword   increasing ListSortMode specifier       decreasing ListSort mode specifier */
+        { "plant_id",       { LIST_SORT_MODE_POW_ID_INCR,           LIST_SORT_MODE_POW_ID_DECR } },
+        { "rated_cap",      { LIST_SORT_MODE_POW_CAP_INCR,          LIST_SORT_MODE_POW_CAP_DECR } },
+        { "avg_price",      { LIST_SORT_MODE_POW_COST_INCR,         LIST_SORT_MODE_POW_COST_DECR } },
+        { "avg_util",       { LIST_SORT_MODE_POW_UTIL_INCR,         LIST_SORT_MODE_POW_UTIL_DECR } },
+    };
+    
+    /// Selected mode sort mode specifiers
+    static const __SortDef __sel_sort_modes[] = {
+        /* string keyword   increasing ListSortMode specifier       decreasing ListSort mode specifier */
+        { "log_id",         { LIST_SORT_MODE_LOG_ID_INCR,           LIST_SORT_MODE_LOG_ID_DECR } },
+        { "plant_id",       { LIST_SORT_MODE_LOG_PLANT_ID_INCR,     LIST_SORT_MODE_LOG_PLANT_ID_DECR } },
+        { "production",     { LIST_SORT_MODE_LOG_PRODUCTION_INCR,   LIST_SORT_MODE_LOG_PRODUCTION_DECR } },
+        { "price",          { LIST_SORT_MODE_LOG_SALE_PRICE_INCR,   LIST_SORT_MODE_LOG_SALE_PRICE_DECR } },
+        { "date",           { LIST_SORT_MODE_LOG_DATE_INCR,         LIST_SORT_MODE_LOG_DATE_DECR } } 
+    };
+
     #define __DEFAULT_BUF_SIZE          4096
     #define __DEFAULT_SMALL_BUF_SIZE    64
     #define __DEFAULT_NAME_LEN          1024

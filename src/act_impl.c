@@ -214,7 +214,7 @@ void listPowerPlants(PowerPlants *p_plants, ListSortMode smode) {
 
     // Copy all pointers to newly allocated power plant reference array
     for(size_t i = 0; i < refs.n; i++)
-        refs.p_plants[i] = &p_plants->plants[i];
+        refs.p_plants[i] = p_plants->plants + i;
 
     // Sort power plants if necessary
     __sortPowerPlantRefs(&refs, smode);
@@ -256,6 +256,13 @@ void listPowerPlantLogs(PlantData *plant, ListSortMode smode) {
 
 /// Edit power plant properties
 void editPowerPlant(Hashmap *plant_map, uint32_t index) {
+    // Check if id parsing failed
+    if(index == UINT32_MAX) {
+        printf("Invalid index given for power plants\n");
+        printf("Try again\n\n");
+        return;
+    }
+
     // Find the PlantData reference
     PlantData *data = (PlantData*) findValue(plant_map, &index, sizeof(uint32_t));
         
@@ -301,7 +308,6 @@ void newLog (
                 p_logs->entries + i);
         }
     }
-
     
     p_logs->entries[p_logs->n] = log;
     p_logs->n++;
@@ -327,6 +333,12 @@ void newLog (
 
 /// Edit the power plant log data
 void editLog(Hashmap *plant_map, Hashmap *log_map, uint32_t sel_id, uint32_t index) {
+    // Check if the id was given
+    if(index == UINT32_MAX) {
+        printf("Invalid index given for power plant logs\n");
+        printf("Try again\n\n");
+        return;
+    }
     // Retrieve the LogEntry reference from the map 
     LogEntry *log = findValue(log_map, &index, sizeof(uint32_t));
 
@@ -349,6 +361,13 @@ void editLog(Hashmap *plant_map, Hashmap *log_map, uint32_t sel_id, uint32_t ind
 
 /// Delete a power plant entry
 void deletePowerPlant(PowerPlants *p_plants, Hashmap *plant_map, uint32_t index) {
+    // Check if the id was given
+    if(index == UINT32_MAX) {
+        printf("Invalid delete index given for power plants\n");
+        printf("Try again\n\n");
+        return;
+    }
+
     PlantData *p_pop_plant = (PlantData*) popFromHashmap(plant_map, &index, sizeof(uint32_t));
 
     // Check if no elements were found in the map
@@ -381,6 +400,13 @@ void deletePowerPlant(PowerPlants *p_plants, Hashmap *plant_map, uint32_t index)
 
 /// Delete a log entry
 void deleteLog(PlantLogs *p_logs, Hashmap *pow_map, Hashmap *log_map, uint32_t sel_id, uint32_t index) {
+    // Check if delete index was correct
+    if(index == UINT32_MAX) {
+        printf("Invalid delete index given for power plants\n");
+        printf("Try again\n\n");
+        return;
+    }
+
     LogEntry *del_entry = (LogEntry*) findValue(log_map, &index, sizeof(uint32_t));
 
     // Check if no entries were found in the map
@@ -420,10 +446,17 @@ void deleteLog(PlantLogs *p_logs, Hashmap *pow_map, Hashmap *log_map, uint32_t s
 
 /// Check if the user provided selection id is available for selection
 void selectionCheck(uint32_t *p_sel_val, uint32_t arg, Hashmap *p_map) {
+    // Check if the id is valid
+    if(arg == UINT32_MAX) {
+        printf("Invalid selection id given\n");
+        printf("Try again\n\n");
+        return;
+    }
+
     // Check if argument value is a valid key value in the given map
     if(!findValue(p_map, &arg, sizeof(uint32_t))) {
         printf("Cannot select power plant with id %u\n"
-               "Power plant not available\n", arg);
+               "Power plant not available\n\n", arg);
     }
 
     else *p_sel_val = arg;

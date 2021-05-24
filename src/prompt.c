@@ -299,30 +299,27 @@ UserInputAction parseUserInputAction (
             if(cmd_arg_n == 1) 
                 *p_sort = LIST_SORT_MODE_POW_ID_INCR;
 
-            // Sorting is done in increasing order
-            else if(cmd_arg_n == 2 || cmd_arg_n == 3 && !strcmp(cmd_args[1], "i")) {
-                if(!strcmp(cmd_args[i], "plant_id")) 
-                    *p_sort = LIST_SORT_MODE_POW_ID_INCR; 
-                else if(!strcmp(cmd_args[i], "rated_cap"))
-                    *p_sort = LIST_SORT_MODE_POW_CAP_INCR;
-                else if(!strcmp(cmd_args[i], "avg_price"))
-                    *p_sort = LIST_SORT_MODE_POW_COST_INCR;
-                else if(!strcmp(cmd_args[i], "avg_util"))
-                    *p_sort = LIST_SORT_MODE_POW_UTIL_INCR;
-                else return USER_INPUT_ACTION_UNKNOWN;
-            }
+            else {
+                size_t mode_i = 0;
+                // Sorting is done in increasing order
+                if(cmd_arg_n == 2 || cmd_arg_n == 3 && !strcmp(cmd_args[1], "i"))
+                    mode_i = 0;
 
-            // Sorting is done in decreasing order
-            else if(cmd_arg_n == 3 && !strcmp(cmd_args[1], "d")) {
-                if(!strcmp(cmd_args[i], "plant_id")) 
-                    *p_sort = LIST_SORT_MODE_POW_ID_DECR; 
-                else if(!strcmp(cmd_args[i], "rated_cap"))
-                    *p_sort = LIST_SORT_MODE_POW_CAP_DECR;
-                else if(!strcmp(cmd_args[i], "avg_price"))
-                    *p_sort = LIST_SORT_MODE_POW_COST_DECR;
-                else if(!strcmp(cmd_args[i], "avg_util"))
-                    *p_sort = LIST_SORT_MODE_POW_UTIL_DECR;
-                else return USER_INPUT_ACTION_UNKNOWN;
+                // Sorting is done in decreasing order
+                else if(cmd_arg_n == 3 && !strcmp(cmd_args[1], "d"))
+                    mode_i = 1;
+
+                // Perform linear search for unselected mode specifiers
+                for(size_t j = 0; j < ARR_LEN(__unsel_sort_modes); j++) {
+                    if(!strcmp(__unsel_sort_modes[j].str_mode, cmd_args[i])) {
+                        *p_sort = __unsel_sort_modes[j].sort_modes[mode_i];
+                        break;
+                    }
+                }
+
+                // Check if unknown return is necessary
+                if(*p_sort == LIST_SORT_MODE_UNKNOWN)
+                    return USER_INPUT_ACTION_UNKNOWN;
             }
         }
 
@@ -331,31 +328,30 @@ UserInputAction parseUserInputAction (
             if(cmd_arg_n == 1)
                 *p_sort = LIST_SORT_MODE_LOG_ID_INCR;
 
-            // Sorting is done in increasing order
-            else if(cmd_arg_n == 2 || cmd_arg_n == 3 && !strcmp(cmd_args[1], "i")) {
-                if(!strcmp(cmd_args[i], "log_id")) 
-                    *p_sort = LIST_SORT_MODE_LOG_ID_INCR; 
-                else if(!strcmp(cmd_args[i], "plant_id"))
-                    *p_sort = LIST_SORT_MODE_LOG_PLANT_ID_INCR;
-                else if(!strcmp(cmd_args[i], "production"))
-                    *p_sort = LIST_SORT_MODE_LOG_PRODUCTION_INCR;
-                else if(!strcmp(cmd_args[i], "price"))
-                    *p_sort = LIST_SORT_MODE_LOG_SALE_PRICE_INCR;
-                else return USER_INPUT_ACTION_UNKNOWN;
+            else {
+                size_t mode_i;
+
+                // Sorting is done in increasing order
+                if(cmd_arg_n == 2 || cmd_arg_n == 3 && !strcmp(cmd_args[1], "i"))
+                    mode_i = 0;
+
+                // Sorting is done in decreasing order
+                else if(cmd_arg_n == 3 && !strcmp(cmd_args[1], "d"))
+                    mode_i = 1;
+
+                // Perform linear search for selected mode specifiers
+                for(size_t j = 0; j < ARR_LEN(__sel_sort_modes); j++) {
+                    if(!strcmp(__sel_sort_modes[j].str_mode, cmd_args[i])) {
+                        *p_sort = __sel_sort_modes[j].sort_modes[mode_i];
+                        break;
+                    }
+                }
+
+                // Check if unknown return is necessary
+                if(*p_sort == LIST_SORT_MODE_UNKNOWN)
+                    return USER_INPUT_ACTION_UNKNOWN;
             }
 
-            // Sorting is done in decreasing order
-            else if(cmd_arg_n == 3 && !strcmp(cmd_args[1], "d")) {
-                if(!strcmp(cmd_args[i], "log_id")) 
-                    *p_sort = LIST_SORT_MODE_LOG_ID_DECR; 
-                else if(!strcmp(cmd_args[i], "plant_id"))
-                    *p_sort = LIST_SORT_MODE_LOG_PLANT_ID_DECR;
-                else if(!strcmp(cmd_args[i], "production"))
-                    *p_sort = LIST_SORT_MODE_LOG_PRODUCTION_DECR;
-                else if(!strcmp(cmd_args[i], "price"))
-                    *p_sort = LIST_SORT_MODE_LOG_SALE_PRICE_DECR;
-                else return USER_INPUT_ACTION_UNKNOWN;
-            }
         }
         
         // Check if argument is required

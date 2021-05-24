@@ -216,8 +216,12 @@ double __csvEntryRetrieveFloat(CsvEntry *p_entry) {
 char *__csvEntryRetrieveString(CsvEntry *p_entry) {
     // Check the entry type
     switch(p_entry->entry_type) {
-    case CSV_ENTRY_TYPE_STRING:
-        return p_entry->str_data;
+    case CSV_ENTRY_TYPE_STRING: {
+        // Allocate new memory and copy string value to it
+        char *new_str = (char*) calloc(strlen(p_entry->str_data) + 1, sizeof(char));
+        strcpy(new_str, p_entry->str_data);
+        return new_str;
+    }
 
     case CSV_ENTRY_TYPE_FLOAT: 
         fprintf(stderr, "Invalid entry type, got float but expected string\n");
@@ -326,6 +330,7 @@ void parsePowerPlantFile(char *file_name, PowerPlants *p_plants) {
     p_plants->cap = row_c < __DEFAULT_POWER_PLANT_CAP ? __DEFAULT_POWER_PLANT_CAP : __roundToBase2(row_c << 1);
     p_plants->n = 0;
     p_plants->plants = (PlantData*) malloc(p_plants->cap * sizeof(PlantData));
+    p_plants->max_id = 0;
     
     // For each row verify the correct data type and and set the PlantData values
     for(size_t i = 0; i < row_c; i++) {
@@ -350,6 +355,10 @@ void parsePowerPlantFile(char *file_name, PowerPlants *p_plants) {
             p_plants->max_id = p_plants->plants[i].no;
 
         // Free the CSV row data
+        for(size_t j = 0; j < rows[i].n; j++) {
+            if(rows[i].entries[j].entry_type == CSV_ENTRY_TYPE_STRING)
+                free(rows[i].entries[j].str_data);
+        }
         free(rows[i].entries);
     }
 
@@ -403,7 +412,12 @@ void parseLogsFile(char *file_name, PlantLogs *p_logs) {
         if(p_logs->entries[i].log_id > p_logs->max_id)
             p_logs->max_id = p_logs->entries[i].log_id;
 
-        // Free csv row entries data
+        // Free csv row entry data
+        for(size_t j = 0; j < rows[i].n; j++) {
+            if(rows[i].entries[j].entry_type == CSV_ENTRY_TYPE_STRING)
+                free(rows[i].entries[j].str_data);
+        }
+
         free(rows[i].entries);
     }
 

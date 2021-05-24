@@ -88,6 +88,7 @@ typedef enum ListSortMode {
         "    plant_id -- sort by plant id\n"\
         "    production -- sort by production output\n"\
         "    price -- sort by average price for that day\n"\
+        "    date -- sort by date\n"\
         "edit <ID> -- edit log values\n"\
         "delete <ID> -- delete log\n"\
         "unsel -- unselect current power plant\n"\

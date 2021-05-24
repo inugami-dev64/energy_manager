@@ -125,12 +125,10 @@ static void __reallocateHashmap(Hashmap *p_hm) {
 }
 
 
-/*
- * Key comparisson method
- * Returns 0 if keys are equal, 1 if key1 is longer than key2, -1 if 
- * key2 is longer than key1 then returns 2 if keys are the same length
- * but their memory areas do not match
- */
+/// Key comparisson method
+/// Returns 0 if keys are equal, 1 if key1 is longer than key2, - 1 if 
+/// key2 is longer than key1 then returns 2 if keys are the same length
+/// but their memory areas do not match
 static int __keycmp(void *key1, size_t n1, void *key2, size_t n2) {
     if(n1 < n2) return -1;
     else if(n1 > n2) return 1;
@@ -140,9 +138,7 @@ static int __keycmp(void *key1, size_t n1, void *key2, size_t n2) {
 }
 
 
-/*
- * Search for the bucket index of the key element
- */
+/// Search for the bucket index of the key element
 static int64_t __findIndex(Hashmap *p_hm, void *key, size_t key_size) {
     // INT64_MAX is the default value to return when no item with given key was found
     int64_t out = INT64_MAX;

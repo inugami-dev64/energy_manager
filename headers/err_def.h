@@ -38,5 +38,4 @@
 
 #define INVALID_DATE_FORMAT(file, date)             fprintf(stderr, "Invalid date format '%s' in file '%s', date must be presented in YYYY-MM-DD format", date, file), \
                                                     exit(EXIT_FAILURE)
-
 #endif

@@ -128,8 +128,18 @@ void newPowerPlant (
     Hashmap *p_map
 ) {
     // Check if power plants array needs reallocation
+    PlantData *old_addr = p_plants->plants;
     reallocCheck((void**) &p_plants->plants, sizeof(PlantData), p_plants->n + 1,
         &p_plants->cap);
+
+    // Check if hashmap remapping is necessary
+    if(old_addr - p_plants->plants) {
+        // Check each plantdata instance pop and repush elements with correct memory address
+        for(size_t i = 0; i < p_plants->n; i++) {
+            popFromHashmap(p_map, &p_plants->plants[i].no, sizeof(uint32_t));
+            pushToHashmap(p_map, &p_plants->plants[i].no, sizeof(uint32_t), p_plants->plants + i);
+        }
+    }
 
     // Set the new PlantData instance in power plants array
     p_plants->plants[p_plants->n] = *p_data;
@@ -148,8 +158,18 @@ void newPowerPlant (
 /// an error is thrown
 void newPowerPlantLog(LogEntry *entry, PlantLogs *p_logs, Hashmap *p_map) {
     // Check if reallocation might be necessary
+    LogEntry *old_addr = p_logs->entries;
     reallocCheck((void**) &p_logs->entries, sizeof(LogEntry), p_logs->n + 1,
         &p_logs->cap);
+
+    // Check if hashmap remapping is necessary
+    if(old_addr - p_logs->entries) {
+        // Check each plantdata instance pop and repush elements with correct memory address
+        for(size_t i = 0; i < p_logs->n; i++) {
+            popFromHashmap(p_map, &p_logs->entries[i].log_id, sizeof(uint32_t));
+            pushToHashmap(p_map, &p_logs->entries[i].log_id, sizeof(uint32_t), p_logs->entries + i);
+        }
+    }
 
     // Set new log entry instance 
     p_logs->entries[p_logs->n] = *entry;

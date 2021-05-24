@@ -47,4 +47,8 @@ char *fuelTypeToStr(FuelType tp);
 /// Convert string into appropriate FuelType instance
 FuelType strToFuelType(char *str);
 
+
+/// Array length macro
+#define ARR_LEN(x) sizeof(x) / sizeof(x[0])
+
 #endif
