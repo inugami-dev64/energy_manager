@@ -379,6 +379,8 @@ void deletePowerPlant(PowerPlants *p_plants, Hashmap *plant_map, uint32_t index)
 
     // Free memory allocated for log instances
     free(p_pop_plant->logs.p_entries);
+    // Free memory allocated for plant name
+    free(p_pop_plant->name);
 
     // Find the memory area index in array
     size_t a_ind = p_pop_plant - p_plants->plants; 

@@ -32,8 +32,8 @@ void reallocCheck(void **p_data, size_t size, size_t req_n, size_t *p_cap) {
     // Check if the required memory size is bigger than capacity
     if(size * req_n >= (*p_cap)) {
         // Assign new capacity value determined from the rounded required size or rounded previous cap * 2
-        (*p_cap) = __roundToBase2(size * req_n) < __roundToBase2((*p_cap) >> 1) ? 
-                   __roundToBase2((*p_cap) >> 1) : __roundToBase2((size * req_n) >> 1);
+        (*p_cap) = __roundToBase2(size * req_n) < __roundToBase2((*p_cap) << 1) ? 
+                   __roundToBase2((*p_cap) << 1) : __roundToBase2((size * req_n) << 1);
 
         // Attempt reallocation
         void *tmp = realloc((*p_data), (*p_cap) * size);

@@ -52,6 +52,50 @@ void iswap (
     }
 }
 
+
+/// Check if the data sorting should set for floating point integer to 
+/// destination buffe
+void fswap (
+    bool is_decr, 
+    float lval, 
+    float rval, 
+    void *dst, 
+    void *la, 
+    void *ra, 
+    size_t stride, 
+    size_t *p_i, 
+    size_t *p_j
+) {
+    // Sorting order is not decreasing and left subarray value is greater than
+    // corresponding right subarray value
+    if(!is_decr && lval <= rval) {
+        memcpy(dst, la, stride);
+        (*p_i)++;
+    }
+
+    // Sorting order is not decreasing and right subarray value is greater than
+    // corresponding left subarray value
+    else if(!is_decr && lval > rval) {
+        memcpy(dst, ra, stride);
+        (*p_j)++;
+    }
+
+    // Sorting order is decreasing and left subarray value is greater than
+    // corresponding right subarray value
+    else if(is_decr && lval >= rval) {
+        memcpy(dst, la, stride);
+        (*p_i)++;
+    }
+
+    // Sorting order is decreasing and right subarray value is greater than
+    // corresponding left subarray value
+    else if(is_decr && lval < rval) {
+        memcpy(dst, ra, stride);
+        (*p_j)++;
+    }
+}
+
+
 /// Check how the subarray element sorting should be done for sorting
 /// float values
 void __sortCheckf (
@@ -72,7 +116,7 @@ void __sortCheckf (
     float rval = is_ref ? *(float*) (*((void**) ra) + val_offset) :
         *(float*) (ra + val_offset);
 
-    iswap(is_decr, lval, rval, dst, la, ra, stride, p_i, p_j);
+    fswap(is_decr, lval, rval, dst, la, ra, stride, p_i, p_j);
 }
 
 

@@ -27,8 +27,14 @@ typedef enum SortValueType {
 
     #include <entity_data.h>
 
-    /// Check if the data sorting should set data to destination buffer
+    /// Check if the data sorting should set for integer to destination buffe
     void iswap(bool is_decr, uint32_t lval, uint32_t rval, void *dst, void *la, 
+        void *ra, size_t stride, size_t *p_i, size_t *p_j);
+
+
+    /// Check if the data sorting should set for floating point integer to 
+    /// destination buffe
+    void fswap(bool is_decr, float lval, float rval, void *dst, void *la, 
         void *ra, size_t stride, size_t *p_i, size_t *p_j);
 
 
