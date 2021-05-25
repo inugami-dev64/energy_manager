@@ -2,7 +2,7 @@
  * File:        data_parser.c
  * Author:      Karl-Mihkel Ott
  * Created      2021-05-11
- * Last edit:   2021-05-13
+ * Last edit:   2021-05-25
  * Description: Function definitions for csv data parser
  */
 

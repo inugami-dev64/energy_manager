@@ -122,6 +122,10 @@ DuplicateEntryAction __promptDuplicateAction() {
         fflush(stdout);
         scanf("%c", &sel);
 
+        // Read until newline or end of line
+        char ch;
+        while((ch = fgetc(stdin)) != EOF && ch != '\n');
+
         // Check if the read character is correctly between bounds
         if(sel >= 'a' && sel <= 'd')
             break;
@@ -535,6 +539,10 @@ uint32_t __promptIdValue(char *msg, size_t *p_max_id, Hashmap *p_map) {
             // Get the integer value of given number
             uint32_t no = atoi(str_no);
 
+            // Check if given id is a forbidden number 4294967295
+            if(no == UINT32_MAX)
+                goto ERR;
+
             // Check if the value does not collide with already existing one
             if(!findValue(p_map, &no, sizeof(uint32_t))) {
                 id = no;
@@ -546,8 +554,9 @@ uint32_t __promptIdValue(char *msg, size_t *p_max_id, Hashmap *p_map) {
         }
 
         else {
-            printf("Please enter a valid number!\n");
-            continue;
+            ERR:
+                printf("Please enter a valid number!\n");
+                continue;
         }
 
         printf("ID %s is already used\n", str_no);

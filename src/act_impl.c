@@ -313,7 +313,8 @@ void newLog (
     p_logs->n++;
 
     // Push log entry to hashmap
-    pushToHashmap(log_map, &log.log_id, sizeof(uint32_t), 
+    printf("log_id: %u\n", log.log_id);
+    pushToHashmap(log_map, &p_logs->entries[p_logs->n - 1].log_id, sizeof(uint32_t), 
         p_logs->entries + p_logs->n - 1);
 
     // Retrieve associated power plant instance and push new LogEntry value
@@ -339,11 +340,14 @@ void editLog(Hashmap *plant_map, Hashmap *log_map, uint32_t sel_id, uint32_t ind
         printf("Try again\n\n");
         return;
     }
+
     // Retrieve the LogEntry reference from the map 
+    printf("%u\n", index);
     LogEntry *log = findValue(log_map, &index, sizeof(uint32_t));
 
     // Check if the retrieval was successful
     if(!log || log->plant_no != sel_id) {
+        printf("%p\n", log);
         printf("Cannot edit log entry with ID %u\n"\
                "Log not available\n", index);
         return;
@@ -434,14 +438,20 @@ void deleteLog(PlantLogs *p_logs, Hashmap *pow_map, Hashmap *log_map, uint32_t s
             p_logs->entries + i - 1);
     }
        
-    // For each element after the invalid reference, shift the references to the left
-    for(size_t i = del_entry->ref_ind + 1; i < p_data->logs.n; i++)
-        p_data->logs.p_entries[i - 1] = p_data->logs.p_entries[i];
+    
 
-    // Set the deprecated values to zero
-    memset(p_data->logs.p_entries + p_data->logs.n - 1, 0, sizeof(LogEntry*));
+    // For each log entry check and select new value for associated PowerPlant instance
+    for(size_t i = 0, j = 0; i < p_logs->n; i++) {
+        if(p_logs->entries[i].plant_no == p_data->no) {
+            p_data->logs.p_entries[j] = p_logs->entries + i;
+            j++;
+        }
+    }
+
+    // Set the deprecated log data value to zero
     memset(p_logs->entries + p_logs->n - 1, 0, sizeof(LogEntry));
     p_logs->n--;
+    memset(p_data->logs.p_entries + p_data->logs.n - 1, 0, sizeof(LogEntry*));
     p_data->logs.n--;
 }
 
