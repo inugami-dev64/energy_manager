@@ -141,9 +141,9 @@ DuplicateEntryAction __promptDuplicateAction() {
 static UserInputAction __convertStrInputToEnum(Hashmap *tokens, char *in_str, bool is_sel, size_t len) {
     // Check if the command is mode independent
     if(!len) return USER_INPUT_ACTION_UNKNOWN;
-    else if(!strncmp(in_str, SAVE, len))
+    else if(!strncmp(in_str, "save", len))
         return USER_INPUT_ACTION_SAVE;
-    else if(!strncmp(in_str, EXIT, len))
+    else if(!strncmp(in_str, "exit", len))
         return USER_INPUT_ACTION_EXIT;
 
     char buf[__DEFAULT_BUF_SIZE] = { 0 };
@@ -161,6 +161,7 @@ static UserInputAction __convertStrInputToEnum(Hashmap *tokens, char *in_str, bo
         strncpy(buf, in_str, len);
         sprintf(buf + len, "%s", UNSEL_SPECIFIER);
         len += strlen(UNSEL_SPECIFIER);
+        printf("%s %lu\n", buf, len);
     }
 
     // Return the pointer value which should be castable to UserInputAction 
@@ -208,41 +209,14 @@ Hashmap tokeniseUserInput() {
     Hashmap map = {};
     newHashmap(&map, __roundToBase2(2 * USER_INPUT_ACTION_ENUM_C));
 
-    // Push unselected mode tokens into map
-    // PS! Action enumeral value will be stored as a pointer that must 
-    // never be dereferenced, instead the pointer's value should be used instead
-    pushToHashmap(&map, UNSEL_HELP UNSEL_SPECIFIER, strlen(UNSEL_HELP
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SHOW_HELP);
-    pushToHashmap(&map, UNSEL_NEW UNSEL_SPECIFIER, strlen(UNSEL_NEW
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_NEW_POWER_PLANT);
-    pushToHashmap(&map, UNSEL_LIST UNSEL_SPECIFIER, strlen(UNSEL_LIST
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_LIST_PLANTS);
-    pushToHashmap(&map, UNSEL_LOG UNSEL_SPECIFIER, strlen(UNSEL_LOG
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SHOW_LOGS);
-    pushToHashmap(&map, UNSEL_EDIT UNSEL_SPECIFIER, strlen(UNSEL_EDIT
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_EDIT_POWER_PLANT);
-    pushToHashmap(&map, UNSEL_DEL UNSEL_SPECIFIER, strlen(UNSEL_DEL
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_DELETE_POWER_PLANT);
-    pushToHashmap(&map, UNSEL_SEL UNSEL_SPECIFIER, strlen(UNSEL_SEL
-        UNSEL_SPECIFIER), (void*) USER_INPUT_ACTION_U_SELECT_POWER_PLANT);
-
-    // Push selected mode tokens into the map
-    pushToHashmap(&map, SEL_HELP SEL_SPECIFIER, strlen(SEL_HELP
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_SHOW_HELP);
-    pushToHashmap(&map, SEL_NEW SEL_SPECIFIER, strlen(SEL_NEW
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_NEW_LOG);
-    pushToHashmap(&map, SEL_LIST SEL_SPECIFIER, strlen(SEL_LIST
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_LIST_LOGS);
-    pushToHashmap(&map, SEL_EDIT SEL_SPECIFIER, strlen(SEL_EDIT
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_EDIT_LOG);
-    pushToHashmap(&map, SEL_DEL SEL_SPECIFIER, strlen(SEL_DEL
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_DELETE_LOG);
-    pushToHashmap(&map, SEL_UNSEL SEL_SPECIFIER, strlen(SEL_UNSEL
-        SEL_SPECIFIER), (void*) USER_INPUT_ACTION_S_UNSEL_POWER_PLANT);
-
-    // Push mode independent tokens to the hashmap
-    pushToHashmap(&map, SAVE, strlen(SAVE), (void*) USER_INPUT_ACTION_SAVE);
-    pushToHashmap(&map, EXIT, strlen(EXIT), (void*) USER_INPUT_ACTION_EXIT);
+    // For each command token in array of command tokens push it to map
+    for(size_t i = 0; i < ARR_LEN(__cmd_tokens); i++) {
+        // Push command token to hashmap
+        // PS! Action enumeral value will be stored as a pointer that must 
+        // never be dereferenced, instead the pointer's value should be used instead
+        pushToHashmap(&map, __cmd_tokens[i].token, strlen(__cmd_tokens[i].token), 
+            (void*) __cmd_tokens[i].act);
+    }
 
     return map;
 }
@@ -328,7 +302,7 @@ UserInputAction parseUserInputAction (
         }
 
         // Check if the parsed action is log listing
-        else if(act == USER_INPUT_ACTION_U_SHOW_LOGS || act == USER_INPUT_ACTION_S_LIST_LOGS) {
+        else if(act == USER_INPUT_ACTION_U_LIST_LOGS || act == USER_INPUT_ACTION_S_LIST_LOGS) {
             if(cmd_arg_n == 1)
                 *p_sort = LIST_SORT_MODE_LOG_ID_INCR;
 

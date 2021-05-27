@@ -287,6 +287,12 @@ void newLog (
 ) {
     LogEntry log = promptNewLogEntry(log_map, &p_logs->max_id, sel_id);
 
+    // Check if value popping is needed for hashmap
+    if(p_logs->n + 1 < p_logs->cap) {
+        for(size_t i = 0; i < p_logs->n; i++)
+            popFromHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t));
+    }
+
     // Push the log entry to PlantLogs array
     LogEntry *prev_val = p_logs->entries;
     reallocCheck((void**) &p_logs->entries, sizeof(LogEntry), p_logs->n + 1,
@@ -303,7 +309,6 @@ void newLog (
 
         // For each log replace its value in hashmap
         for(size_t i = 0; i < p_logs->n; i++) {
-            popFromHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t));
             pushToHashmap(log_map, &p_logs->entries[i].log_id, sizeof(uint32_t),
                 p_logs->entries + i);
         }
@@ -551,6 +556,10 @@ void saveData (
     // Free all buffers allocated
     free(plant_buf);
     free(log_buf);
+
+    // Close file streams
+    fclose(plant_file);
+    fclose(log_file);
 
     printf("Saved to files '%s' and '%s'!\n", plants_file, logs_file);
 }

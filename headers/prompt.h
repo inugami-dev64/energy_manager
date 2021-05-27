@@ -26,7 +26,7 @@ typedef enum UserInputAction {
     USER_INPUT_ACTION_U_SHOW_HELP               = 1,
     USER_INPUT_ACTION_U_NEW_POWER_PLANT         = 2,
     USER_INPUT_ACTION_U_LIST_PLANTS             = 3,
-    USER_INPUT_ACTION_U_SHOW_LOGS               = 4,
+    USER_INPUT_ACTION_U_LIST_LOGS               = 4,
     USER_INPUT_ACTION_U_EDIT_POWER_PLANT        = 5,
     USER_INPUT_ACTION_U_DELETE_POWER_PLANT      = 6,
     USER_INPUT_ACTION_U_SELECT_POWER_PLANT      = 7,
@@ -74,28 +74,43 @@ typedef enum UserInputAction {
     static UserInputAction __convertStrInputToEnum(Hashmap *tokens, char *in_str, bool is_sel, size_t len);
 
 
-    /// Token definitions
-    /// UNSEL means unselected mode token and SEL means selected mode token
-    #define UNSEL_HELP          "help"
-    #define UNSEL_LIST          "list"
-    #define UNSEL_NEW           "new"
-    #define UNSEL_LOG           "log"
-    #define UNSEL_EDIT          "edit"
-    #define UNSEL_DEL           "delete"
-    #define UNSEL_SEL           "select"
+    /// Specifiers for tokens to identify their mode
     #define UNSEL_SPECIFIER     "_u"
-
-    #define SEL_HELP            "help"
-    #define SEL_NEW             "new"
-    #define SEL_LIST            "list"
-    #define SEL_EDIT            "edit"
-    #define SEL_DEL             "delete"
-    #define SEL_UNSEL           "unsel"
     #define SEL_SPECIFIER       "_s"
 
-    /// Mode independent commands
-    #define SAVE                "save"
-    #define EXIT                "exit"
+
+    /// Token definitions
+    typedef struct __TokenDef {
+        char *token;
+        UserInputAction act;
+    } __TokenDef;
+
+
+    /// All possible command tokens
+    #define __MAX_TOKEN_LEN     16
+    static const __TokenDef __cmd_tokens[] = {
+        // Unselected mode tokens
+        { "help"        UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_SHOW_HELP },
+        { "list"        UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_LIST_PLANTS },
+        { "new"         UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_NEW_POWER_PLANT },
+        { "log"         UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_LIST_LOGS },
+        { "edit"        UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_EDIT_POWER_PLANT },
+        { "delete"      UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_DELETE_POWER_PLANT },
+        { "select"      UNSEL_SPECIFIER,    USER_INPUT_ACTION_U_SELECT_POWER_PLANT },
+
+        // Selected mode tokens
+        { "help"        SEL_SPECIFIER,      USER_INPUT_ACTION_S_SHOW_HELP },
+        { "list"        SEL_SPECIFIER,      USER_INPUT_ACTION_S_LIST_LOGS },
+        { "new"         SEL_SPECIFIER,      USER_INPUT_ACTION_S_NEW_LOG },
+        { "edit"        SEL_SPECIFIER,      USER_INPUT_ACTION_S_EDIT_LOG },
+        { "delete"      SEL_SPECIFIER,      USER_INPUT_ACTION_S_DELETE_LOG },
+        { "unsel"       SEL_SPECIFIER,      USER_INPUT_ACTION_S_UNSEL_POWER_PLANT },
+
+        // General purpose commands
+        { "save",              USER_INPUT_ACTION_SAVE },
+        { "exit",              USER_INPUT_ACTION_EXIT }
+    };
+
 
     /// Structure for specifying all differenct sorting modes
     typedef struct __SortDef {

@@ -56,8 +56,8 @@ void poll(char *pow_file, char *log_file) {
         // Parse the input into enumeral value
         uint32_t arg = UINT32_MAX;
         sort_mode = LIST_SORT_MODE_UNKNOWN;
-        UserInputAction act = parseUserInputAction(&tokens, in_buf, (selected == UINT32_MAX ? 
-            false : true), &sort_mode, &arg);
+        UserInputAction act = parseUserInputAction(&tokens, in_buf, selected != UINT32_MAX,
+            &sort_mode, &arg);
 
         // Check the parsed action value and call appropriate functions
         switch(act) {
@@ -78,7 +78,7 @@ void poll(char *pow_file, char *log_file) {
             editPowerPlant(&pow_map, arg);
             break;
 
-        case USER_INPUT_ACTION_U_SHOW_LOGS:
+        case USER_INPUT_ACTION_U_LIST_LOGS:
             listAllLogs(&logs, sort_mode);
             break;
 

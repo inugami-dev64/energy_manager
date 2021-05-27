@@ -127,18 +127,21 @@ void newPowerPlant (
     PowerPlants *p_plants, 
     Hashmap *p_map
 ) {
+    // Check if data should be popped from hashmap due to the reallocation
+    if(p_plants->n + 1 <= p_plants->cap) {
+        for(size_t i = 0; i < p_plants->n; i++)
+            popFromHashmap(p_map, &p_plants->plants[i].no, sizeof(uint32_t));
+    }
+
     // Check if power plants array needs reallocation
-    PlantData *old_addr = p_plants->plants;
     reallocCheck((void**) &p_plants->plants, sizeof(PlantData), p_plants->n + 1,
         &p_plants->cap);
 
-    // Check if hashmap remapping is necessary
-    if(old_addr - p_plants->plants) {
+    // Check if new references should be push to hashmap
+    if(p_plants->n + 1 <= p_plants->cap) {
         // Check each plantdata instance pop and repush elements with correct memory address
-        for(size_t i = 0; i < p_plants->n; i++) {
-            popFromHashmap(p_map, &p_plants->plants[i].no, sizeof(uint32_t));
+        for(size_t i = 0; i < p_plants->n; i++)
             pushToHashmap(p_map, &p_plants->plants[i].no, sizeof(uint32_t), p_plants->plants + i);
-        }
     }
 
     // Set the new PlantData instance in power plants array
