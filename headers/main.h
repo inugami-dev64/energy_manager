@@ -11,6 +11,7 @@
 
 #ifdef __MAIN_C
     #include <stdlib.h>
+    #include <time.h>
     #include <stdbool.h>
     #include <stdio.h>
     #include <ncurses.h>
@@ -24,6 +25,7 @@
     #include <act_impl.h>
     #include <data_parser.h>
     #include <prompt.h>
+    #include <log.h>
     #include <energy_manager.h>
     
     #define __DEFAULT_BUF_LEN   1024
@@ -31,7 +33,7 @@
 
 
 /// Poll user input
-void poll(char *pow_file, char *log_file);
+void poll(char *pow_file, char *log_file, time_t start);
 
 
 #endif

@@ -199,9 +199,12 @@ void showHelp(bool is_sel) {
 
 /// Ask information about the new power plant instance from the user
 /// and create a new instance
-void createNewPowerPlant(PowerPlants *p_plants, Hashmap *p_map) {
+void createNewPowerPlant(PowerPlants *p_plants, uint32_t *arg, Hashmap *p_map) {
     PlantData user_data = promptNewPowerPlant(&p_plants->max_id, p_map);
     newPowerPlant(&user_data, p_plants, p_map);
+    
+    // Set the id argument accordingly
+    *arg = p_plants->plants[p_plants->n - 1].no;
 }
 
 
@@ -283,6 +286,7 @@ void newLog (
     Hashmap *log_map, 
     PowerPlants *p_plants, 
     PlantLogs *p_logs, 
+    uint32_t *arg,
     uint32_t sel_id
 ) {
     LogEntry log = promptNewLogEntry(log_map, &p_logs->max_id, sel_id);
@@ -318,7 +322,6 @@ void newLog (
     p_logs->n++;
 
     // Push log entry to hashmap
-    printf("log_id: %u\n", log.log_id);
     pushToHashmap(log_map, &p_logs->entries[p_logs->n - 1].log_id, sizeof(uint32_t), 
         p_logs->entries + p_logs->n - 1);
 
@@ -334,6 +337,9 @@ void newLog (
     // Recalculate average cost and utilisation
     calcAvgCost(p_pow_data);
     calcAvgUtilisation(p_pow_data);
+
+    // Set the id argument value accordingly
+    *arg = p_logs->entries[p_logs->n - 1].log_id;
 }
 
 
@@ -347,12 +353,10 @@ void editLog(Hashmap *plant_map, Hashmap *log_map, uint32_t sel_id, uint32_t ind
     }
 
     // Retrieve the LogEntry reference from the map 
-    printf("%u\n", index);
     LogEntry *log = findValue(log_map, &index, sizeof(uint32_t));
 
     // Check if the retrieval was successful
     if(!log || log->plant_no != sel_id) {
-        printf("%p\n", log);
         printf("Cannot edit log entry with ID %u\n"\
                "Log not available\n", index);
         return;

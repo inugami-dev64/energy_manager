@@ -121,7 +121,7 @@ void showHelp(bool is_sel);
 
 /// Ask information about the new power plant instance from the user
 /// and create a new instance
-void createNewPowerPlant(PowerPlants *p_plants, Hashmap *p_map);
+void createNewPowerPlant(PowerPlants *p_plants, uint32_t *arg, Hashmap *p_map);
 
 
 /// List all currently available power plants according to specified sort mode
@@ -142,7 +142,7 @@ void editPowerPlant(Hashmap *plant_map, uint32_t index);
 
 /// Create a new log for certain power plant instance
 void newLog(Hashmap *pow_map, Hashmap *log_map, PowerPlants *p_plants, 
-    PlantLogs *p_logs, uint32_t sel_id);
+    PlantLogs *p_logs, uint32_t *arg, uint32_t sel_id);
 
 
 /// Edit the power plant log data

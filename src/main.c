@@ -12,14 +12,19 @@
 
 
 /// Poll user input
-void poll(char *pow_file, char *log_file) {
+void poll(char *pow_file, char *log_file, time_t start) {
+    // Create a new logger instance
+    FILE *slog = newLogger(start);
+
     // Parse and log power plants information
     PowerPlants plants = { 0 };
     parsePowerPlantFile(pow_file, &plants);
+    logMiscInfo(slog, "Parsed power plant file contents\n", start);
 
     // Parse and log power plant logs
     PlantLogs logs = { 0 };
     parseLogsFile(log_file, &logs);
+    logMiscInfo(slog, "Parsed log file contents\n", start);
 
     // Create commandline token map
     Hashmap tokens = tokeniseUserInput();
@@ -36,6 +41,7 @@ void poll(char *pow_file, char *log_file) {
 
     // Set the selected id as maximum possible
     uint32_t selected = UINT32_MAX;
+    char *name_arg = NULL;
     ListSortMode sort_mode = LIST_SORT_MODE_UNKNOWN;
 
     // Allocate resources for ncurses
@@ -43,7 +49,8 @@ void poll(char *pow_file, char *log_file) {
            "To view all available commands type 'help'\n\n");
 
     // Main program loop
-    while(true) {
+    bool is_running = true;
+    while(is_running) {
         // Print the energy manager input section prompt to line before end
         if(selected == UINT32_MAX)
             printf("(energy_manager) ");
@@ -67,7 +74,7 @@ void poll(char *pow_file, char *log_file) {
             break;
 
         case USER_INPUT_ACTION_U_NEW_POWER_PLANT:
-            createNewPowerPlant(&plants, &pow_map);
+            createNewPowerPlant(&plants, &arg, &pow_map);
             break;
 
         case USER_INPUT_ACTION_U_LIST_PLANTS:
@@ -105,7 +112,7 @@ void poll(char *pow_file, char *log_file) {
             break;
 
         case USER_INPUT_ACTION_S_NEW_LOG: {
-            newLog(&pow_map, &log_map, &plants, &logs, selected);
+            newLog(&pow_map, &log_map, &plants, &logs, &arg, selected);
             break;
         }
 
@@ -115,6 +122,7 @@ void poll(char *pow_file, char *log_file) {
 
         case USER_INPUT_ACTION_S_UNSEL_POWER_PLANT:
             selected = UINT32_MAX;
+            name_arg = NULL;
             break;
 
         case USER_INPUT_ACTION_SAVE:
@@ -137,17 +145,28 @@ void poll(char *pow_file, char *log_file) {
             // Free all memory that was allocated for storing plant and log data
             free(plants.plants);
             free(logs.entries);
-            return;
+
+            is_running = false;
+            break;
 
         default:
             printf("Unknown command '%s'\n", in_buf);
             break;
         }
+
+        // Log the command into command log file
+        logCommandAction(slog, act, arg != UINT32_MAX ? arg : selected, start);
     }
+
+    // Close the log file stream
+    destroyLogger(slog);
 }
 
 
 int main(int argc, char *argv[]) {
+    // Start measuring program runtime duration
+    time_t start = time(NULL);
+
     // Read the user input about power plant file
     char pow_file[1024] = { 0 };
     printf("Enter power plant file name: ");
@@ -163,6 +182,6 @@ int main(int argc, char *argv[]) {
     log_file[strlen(log_file) - 1] = 0x00;
 
     // Start input polling
-    poll(pow_file, log_file);
+    poll(pow_file, log_file, start);
     return EXIT_SUCCESS;
 }

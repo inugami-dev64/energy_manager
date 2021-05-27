@@ -12,7 +12,8 @@ OBJ = $(OBJ_DIR)/data_parser.c.o \
 	  $(OBJ_DIR)/mem_check.c.o \
 	  $(OBJ_DIR)/prompt.c.o \
 	  $(OBJ_DIR)/act_impl.c.o \
-	  $(OBJ_DIR)/algo.c.o
+	  $(OBJ_DIR)/algo.c.o \
+	  $(OBJ_DIR)/log.c.o
 
 
 all: .dst_check $(OBJ)
@@ -63,6 +64,9 @@ $(OBJ_DIR)/algo.c.o: $(SRC_DIR)/algo.c
 	@echo "Building algo.c"
 	@$(CC) -c $(SRC_DIR)/algo.c $(FLAGS) -o $(OBJ_DIR)/algo.c.o -I $(HEADERS)
 
+$(OBJ_DIR)/log.c.o: $(SRC_DIR)/log.c
+	@echo "Building log.c"
+	@$(CC) -c $(SRC_DIR)/log.c $(FLAGS) -o $(OBJ_DIR)/log.c.o -I $(HEADERS)
 
 
 # Cleanup operation
